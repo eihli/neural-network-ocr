@@ -1,0 +1,33 @@
+<html>
+  <body>
+    <canvas id="canvas">
+      <script>
+        GRID_STROKE_COLOR = "blue";
+        BACKGROUND_COLOR = "black";
+        STROKE_COLOR = "white";
+        CANVAS_WIDTH = 200;
+        // We'll draw on a 10 x 10 grid.
+        // CANVAS_WIDTH divided by 10 grid blocks equals 20 pixels per grid block.
+        SCALED_PIXEL_WIDTH = 20;
+        function drawGrid(ctx) {
+            for (
+                let x = SCALED_PIXEL_WIDTH, y = this.SCALED_PIXEL_WIDTH;
+                x < this.CANVAS_WIDTH;
+                x += this.SCALED_PIXEL_WIDTH, y += this.SCALED_PIXEL_WIDTH
+            ) {
+                ctx.strokeStyle = this.BLUE;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, this.CANVAS_WIDTH);
+                ctx.moveTo(0, y);
+                ctx.lineTo(this.CANVAS_WIDTH, y);
+                ctx.stroke();
+            }
+        };
+        let canvasEl = document.getElementById("canvas");
+        let context = canvasEl.getContext("2d");
+        drawGrid(context);
+      </script>
+    </canvas>
+  </body>
+</html>

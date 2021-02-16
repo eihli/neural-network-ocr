@@ -1,0 +1,68 @@
+<html>
+  <body>
+    <canvas id="canvas" width="200" height="200"></canvas>
+    <script>
+      GRID_STROKE_COLOR = "blue";
+      BACKGROUND_COLOR = "black";
+      STROKE_COLOR = "white";
+      CANVAS_WIDTH = 200;
+      // We'll draw on a 10 x 10 grid.
+      // CANVAS_WIDTH divided by 10 grid blocks equals 20 pixels per grid block.
+      SCALED_PIXEL_WIDTH = 20;
+      function drawGrid(ctx) {
+          ctx.strokeStyle = BACKGROUND_COLOR;
+          ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_WIDTH);
+          ctx.strokeStyle = GRID_STROKE_COLOR;
+          for (
+              let x = SCALED_PIXEL_WIDTH, y = SCALED_PIXEL_WIDTH;
+              x < CANVAS_WIDTH;
+              x += SCALED_PIXEL_WIDTH, y += SCALED_PIXEL_WIDTH
+          ) {
+              ctx.beginPath();
+              ctx.moveTo(x, 0);
+              ctx.lineTo(x, CANVAS_WIDTH);
+              ctx.moveTo(0, y);
+              ctx.lineTo(CANVAS_WIDTH, y);
+              ctx.stroke();
+          }
+      };
+      let canvasEl = document.getElementById("canvas");
+      let context = canvasEl.getContext("2d");
+      drawGrid(context);
+
+      function fillSquare(mouseEvent, canvasElement) {
+          let context = canvasElement.getContext("2d");
+          let boundingRect = canvasElement.getBoundingClientRect();
+          let x = mouseEvent.clientX - boundingRect.x;
+          let y = mouseEvent.clientY - boundingRect.y;
+          let xPixel = Math.floor(x / SCALED_PIXEL_WIDTH);
+          let yPixel = Math.floor(y / SCALED_PIXEL_WIDTH);
+          context.fillStyle = STROKE_COLOR;
+          context.fillRect(
+              xPixel * SCALED_PIXEL_WIDTH,
+              yPixel * SCALED_PIXEL_WIDTH,
+              SCALED_PIXEL_WIDTH,
+              SCALED_PIXEL_WIDTH
+          );
+      }
+      function onMouseDown(event, canvas) {
+          canvas.isDrawing = true;
+          fillSquare(event, canvas);
+      }
+      
+      function onMouseUp(canvas) {
+          canvas.isDrawing = false;
+      }
+      
+      function onMouseMove(event, canvas) {
+          if (!canvas.isDrawing) {
+              return;
+          }
+          fillSquare(event, canvas);
+      }
+      canvasEl.onmousemove = function(event) { onMouseMove(event, canvasEl); };
+      canvasEl.onmousedown = function(event) { onMouseDown(event, canvasEl); };
+      canvasEl.onmouseup = function(_) { onMouseUp(canvasEl); };
+    </script>
+  </body>
+</html>

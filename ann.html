@@ -1,0 +1,609 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2021-01-19 Tue 13:15 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Artificial Neural Network From Scratch</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Eric Ihli" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-v3-or-Later
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.cacheClassElem = elem.className;
+         elem.cacheClassTarget = target.className;
+         target.className = "code-highlighted";
+         elem.className   = "code-highlighted";
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(elem.cacheClassElem)
+         elem.className = elem.cacheClassElem;
+       if(elem.cacheClassTarget)
+         target.className = elem.cacheClassTarget;
+     }
+    /*]]>*///-->
+// @license-end
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Artificial Neural Network From Scratch</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgf208438">1. HTML</a></li>
+<li><a href="#orgb7c704b">2. Javascript</a>
+<ul>
+<li><a href="#org4cdb455">2.1. Drawing the grid on canvas</a></li>
+<li><a href="#org82c6504">2.2. Drawing on the grid</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgf208438" class="outline-2">
+<h2 id="orgf208438"><span class="section-number-2">1</span> HTML</h2>
+<div class="outline-text-2" id="text-1">
+<ul class="org-ul">
+<li>Canvas on which to draw numbers</li>
+<li>Buttons to:
+<ul class="org-ul">
+<li>reset the canvas</li>
+<li>add the drawing and its labeled digit to the training data</li>
+<li>predict what number the drawing represents</li>
+</ul></li>
+</ul>
+
+<p>
+The canvas needs to be big enough to draw on with a mouse. On my desktop, a square with sides of 200 pixels seems reasonable.
+</p>
+
+<p>
+But if while we are drawing we only colored the exact pixel under the mouse cursor then the line would be incredibly thin. Therefore instead of treating the 200 x 200 square canvas as 200 x 200 pixels, we should set a scaled pixel width so instead of coloring a single pixel we color an N by N block of pixels.
+</p>
+
+<p>
+The details of the pixel coloring/scaling will be handled in some Javascript later. For now, let&rsquo;s just create an HTML file to work with.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-html">&lt;<span style="color: #c678dd;">html</span>&gt;
+  &lt;<span style="color: #c678dd;">head</span>&gt;
+    &lt;<span style="color: #c678dd;">meta</span> <span style="color: #dcaeea;">charset</span>=<span style="color: #98be65;">"UTF-8"</span>&gt;
+    &lt;<span style="color: #c678dd;">script</span> <span style="color: #dcaeea;">src</span>=<span style="color: #98be65;">"ocr.js"</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"text/javascript"</span>&gt;&lt;/<span style="color: #c678dd;">script</span>&gt;
+    &lt;<span style="color: #c678dd;">link</span> <span style="color: #dcaeea;">rel</span>=<span style="color: #98be65;">"stylesheet"</span> <span style="color: #dcaeea;">href</span>=<span style="color: #98be65;">"ocr.css"</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"text/css"</span> <span style="color: #dcaeea;">media</span>=<span style="color: #98be65;">"screen"</span> /&gt;
+    &lt;<span style="color: #c678dd;">title</span>&gt;<span style="font-weight: bold; text-decoration: underline;">OCR Demo</span>&lt;/<span style="color: #c678dd;">title</span>&gt;
+  &lt;/<span style="color: #c678dd;">head</span>&gt;
+  &lt;<span style="color: #c678dd;">body</span> <span style="color: #dcaeea;">onload</span>=<span style="color: #98be65;">"ocrDemo.onLoadFunction()"</span>&gt;
+    &lt;<span style="color: #c678dd;">div</span> <span style="color: #dcaeea;">id</span>=<span style="color: #98be65;">"main-container"</span> <span style="color: #dcaeea;">style</span>=<span style="color: #98be65;">"text-align: center;"</span>&gt;
+      &lt;<span style="color: #c678dd;">h1</span>&gt;<span style="font-weight: bold; text-decoration: underline;">OCR Demo</span>&lt;/<span style="color: #c678dd;">h1</span>&gt;
+      &lt;<span style="color: #c678dd;">canvas</span> <span style="color: #dcaeea;">id</span>=<span style="color: #98be65;">"canvas"</span> <span style="color: #dcaeea;">width</span>=<span style="color: #98be65;">"200"</span> <span style="color: #dcaeea;">height</span>=<span style="color: #98be65;">"200"</span>&gt;&lt;/<span style="color: #c678dd;">canvas</span>&gt;
+      &lt;<span style="color: #c678dd;">form</span> <span style="color: #dcaeea;">name</span>=<span style="color: #98be65;">"input"</span>&gt;
+        &lt;<span style="color: #c678dd;">label</span> <span style="color: #dcaeea;">for</span>=<span style="color: #98be65;">"digit"</span>&gt;Digit:&lt;/<span style="color: #c678dd;">label</span>&gt;
+        &lt;<span style="color: #c678dd;">input</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"text"</span> <span style="color: #dcaeea;">id</span>=<span style="color: #98be65;">"digit"</span>&gt;
+        &lt;<span style="color: #c678dd;">input</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"button"</span> <span style="color: #dcaeea;">value</span>=<span style="color: #98be65;">"Train"</span> <span style="color: #dcaeea;">onclick</span>=<span style="color: #98be65;">"ocrDemo.train()"</span>&gt;
+        &lt;<span style="color: #c678dd;">input</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"button"</span> <span style="color: #dcaeea;">value</span>=<span style="color: #98be65;">"Test"</span> <span style="color: #dcaeea;">onclick</span>=<span style="color: #98be65;">"ocrDemo.test()"</span>&gt;
+        &lt;<span style="color: #c678dd;">input</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"button"</span> <span style="color: #dcaeea;">value</span>=<span style="color: #98be65;">"Reset"</span> <span style="color: #dcaeea;">onclick</span>=<span style="color: #98be65;">"ocrDemo.resetCanvas()"</span>&gt;
+      &lt;/<span style="color: #c678dd;">form</span>&gt;
+    &lt;/<span style="color: #c678dd;">div</span>&gt;
+  &lt;/<span style="color: #c678dd;">body</span>&gt;
+&lt;/<span style="color: #c678dd;">html</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb7c704b" class="outline-2">
+<h2 id="orgb7c704b"><span class="section-number-2">2</span> Javascript</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+You&rsquo;ll see the stylesheet linked in the HTML is called <code>ocr.js</code>. Let&rsquo;s create that.
+</p>
+
+<p>
+In the body tag, we have an <code>onload</code> handler that calls <code>ocrDemo.onLoadFunction()</code>. That will
+be the start of the <code>ocr.js</code> file. But we&rsquo;ll finish the details later.
+</p>
+
+<p>
+Javascript treats everything defined outside of a function as being in the global namespace. It&rsquo;s a bad habit to pollute the global namespace with things that aren&rsquo;t necessary. So we&rsquo;ll put most of our code inside a function and only put what we absolutely need to in the global namespace.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript" id="org38a6cd2"><span style="color: #51afef;">let</span> <span style="color: #dcaeea;">ocrDemo</span> = (<span style="color: #51afef;">function</span>() {
+    &lt;&lt;javascript ocr functionality&gt;&gt;
+    <span style="color: #51afef;">return</span> {
+        onLoadFunction,
+        resetCanvas
+    };
+})();
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org4cdb455" class="outline-3">
+<h3 id="org4cdb455"><span class="section-number-3">2.1</span> Drawing the grid on canvas</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+Let&rsquo;s define some constants for coloring the canvas.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript"><span style="color: #51afef;">const</span> <span style="color: #dcaeea;">GRID_STROKE_COLOR</span> = <span style="color: #98be65;">"blue"</span>;
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">BACKGROUND_COLOR</span> = <span style="color: #98be65;">"black"</span>;
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">STROKE_COLOR</span> = <span style="color: #98be65;">"white"</span>;
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">CANVAS_WIDTH</span> = <span style="color: #da8548; font-weight: bold;">200</span>;
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">GRID_WIDTH</span> = <span style="color: #da8548; font-weight: bold;">10</span>;
+<span style="color: #5B6268;">// </span><span style="color: #5B6268;">We'll draw on a 10 x 10 grid.</span>
+<span style="color: #5B6268;">// </span><span style="color: #5B6268;">CANVAS_WIDTH divided by 10 GRID_WIDTH equals 20 pixels per grid block.</span>
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">SCALED_PIXEL_WIDTH</span> = CANVAS_WIDTH / GRID_WIDTH;
+</pre>
+</div>
+
+<p>
+We also need a variable to store the information regarding which pixels make up the drawn number.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript"><span style="color: #51afef;">let</span> <span style="color: #dcaeea;">pixelData</span> = [];
+</pre>
+</div>
+
+<p>
+Any time we draw a fresh grid, we&rsquo;ll want to fill the entire canvas with the background color and then re-draw the lines of the grid.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript" id="orgcee4b62"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">drawGrid</span>(<span style="color: #dcaeea;">ctx</span>) {
+    ctx.fillStyle = BACKGROUND_COLOR;
+    ctx.fillRect(<span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">0</span>, CANVAS_WIDTH, CANVAS_WIDTH);
+    ctx.strokeStyle = GRID_STROKE_COLOR;
+    <span style="color: #51afef;">for</span> (
+        <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">x</span> = SCALED_PIXEL_WIDTH, <span style="color: #dcaeea;">y</span> = SCALED_PIXEL_WIDTH;
+        x &lt; CANVAS_WIDTH;
+        x += SCALED_PIXEL_WIDTH, y += SCALED_PIXEL_WIDTH
+    ) {
+        ctx.beginPath();
+        ctx.moveTo(x, <span style="color: #da8548; font-weight: bold;">0</span>);
+        ctx.lineTo(x, CANVAS_WIDTH);
+        ctx.moveTo(<span style="color: #da8548; font-weight: bold;">0</span>, y);
+        ctx.lineTo(CANVAS_WIDTH, y);
+        ctx.stroke();
+    }
+};
+</pre>
+</div>
+
+<p>
+Let&rsquo;s see what the grid looks like at <a href="./drawGridExample.html">./drawGridExample.html</a>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-html" id="org057d05f">&lt;<span style="color: #c678dd;">html</span>&gt;
+  &lt;<span style="color: #c678dd;">body</span>&gt;
+    &lt;<span style="color: #c678dd;">canvas</span> <span style="color: #dcaeea;">id</span>=<span style="color: #98be65;">"canvas"</span> <span style="color: #dcaeea;">width</span>=<span style="color: #98be65;">"200"</span> <span style="color: #dcaeea;">height</span>=<span style="color: #98be65;">"200"</span>&gt;&lt;/<span style="color: #c678dd;">canvas</span>&gt;
+    &lt;<span style="color: #c678dd;">script</span>&gt;
+      &lt;&lt;<span style="color: #c678dd;">javascript</span> constants&gt;&gt;
+      &lt;&lt;<span style="color: #c678dd;">drawGrid</span>&gt;&gt;
+      let canvasEl = document.getElementById("canvas");
+      let context = canvasEl.getContext("2d");
+      drawGrid(context);
+    &lt;/<span style="color: #c678dd;">script</span>&gt;
+  &lt;/<span style="color: #c678dd;">body</span>&gt;
+&lt;/<span style="color: #c678dd;">html</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org82c6504" class="outline-3">
+<h3 id="org82c6504"><span class="section-number-3">2.2</span> Drawing on the grid</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+Let&rsquo;s write a function that will take a mouse event and a canvas element and will fill a square of the grid.
+</p>
+
+<p>
+Mouse events have a <code>clientX</code> and <code>clientY</code> property that represent the pixel coordinates of the mouse. Those coordinates are relative to the applications viewport. For example, clicking on the left edge of the viewable area of a page will always result in a mouse event with a <code>clientX</code> of <code>0</code>, regardless of whether the page is scrolled horizontally.
+</p>
+
+<p>
+We also need to know where the canvas element is in relation to the viewport so that we can draw in the correct square of the grid. Elements have a <code>getBoundingClientRect()</code> function that returns an object that has <code>x</code> and <code>y</code> properties denoting the pixel positions of their left-most and top-most edges.
+</p>
+
+<p>
+If the left edge of the canvas is <code>100</code> pixels to the right of the left edge of the viewport, and if a mouse event has a <code>clientX</code> between <code>100</code> and <code>120</code>, then we know the mouse is in the first column of squares of the grid.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript" id="org87ebd4d"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">fillSquare</span>(<span style="color: #dcaeea;">mouseEvent</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvasElement</span>) {
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">boundingRect</span> = canvasElement.getBoundingClientRect();
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">x</span> = mouseEvent.clientX - boundingRect.x;
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">y</span> = mouseEvent.clientY - boundingRect.y;
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">xPixel</span> = Math.floor(x / SCALED_PIXEL_WIDTH);
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">yPixel</span> = Math.floor(y / SCALED_PIXEL_WIDTH);
+    context.fillStyle = STROKE_COLOR;
+    context.fillRect(
+        xPixel * SCALED_PIXEL_WIDTH,
+        yPixel * SCALED_PIXEL_WIDTH,
+        SCALED_PIXEL_WIDTH,
+        SCALED_PIXEL_WIDTH
+    );
+    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">Along with coloring the square in the grid,</span>
+    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">we also want to store the information that we colored</span>
+    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">a particular pixel in our pixelData that we'll later</span>
+    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">send to a server to either train our model or make</span>
+    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">a prediction.</span>
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">pixelIndex</span> = yPixel * GRID_WIDTH + xPixel;
+    pixelData[pixelIndex] = <span style="color: #da8548; font-weight: bold;">1</span>;
+    console.log(pixelData);
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-javascript" id="org2f7c8e6"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">onMouseDown</span>(<span style="color: #dcaeea;">event</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvas</span>) {
+    canvas.isDrawing = <span style="color: #a9a1e1;">true</span>;
+    fillSquare(event, context, canvas);
+}
+
+<span style="color: #51afef;">function</span> <span style="color: #c678dd;">onMouseUp</span>(<span style="color: #dcaeea;">canvas</span>) {
+    canvas.isDrawing = <span style="color: #a9a1e1;">false</span>;
+}
+
+<span style="color: #51afef;">function</span> <span style="color: #c678dd;">onMouseMove</span>(<span style="color: #dcaeea;">event</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvas</span>) {
+    <span style="color: #51afef;">if</span> (!canvas.isDrawing) {
+        <span style="color: #51afef;">return</span>;
+    }
+    fillSquare(event, context, canvas);
+}
+</pre>
+</div>
+
+<p>
+Let&rsquo;s try it out! See <a href="./mouseEventsExample.html">./mouseEventsExample.html</a>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-html">&lt;<span style="color: #c678dd;">html</span>&gt;
+  &lt;<span style="color: #c678dd;">body</span>&gt;
+    &lt;<span style="color: #c678dd;">canvas</span> <span style="color: #dcaeea;">id</span>=<span style="color: #98be65;">"canvas"</span> <span style="color: #dcaeea;">width</span>=<span style="color: #98be65;">"200"</span> <span style="color: #dcaeea;">height</span>=<span style="color: #98be65;">"200"</span>&gt;&lt;/<span style="color: #c678dd;">canvas</span>&gt;
+    &lt;<span style="color: #c678dd;">script</span>&gt;
+      &lt;&lt;<span style="color: #c678dd;">javascript</span> constants&gt;&gt;
+      &lt;&lt;<span style="color: #c678dd;">drawGrid</span>&gt;&gt;
+      let canvasEl = document.getElementById("canvas");
+      let context = canvasEl.getContext("2d");
+      drawGrid(context);
+
+      &lt;&lt;<span style="color: #c678dd;">fillSquare</span>&gt;&gt;
+      &lt;&lt;<span style="color: #c678dd;">mouse</span> events&gt;&gt;
+      canvasEl.onmousemove = function(event) { onMouseMove(event, context, canvasEl); };
+      canvasEl.onmousedown = function(event) { onMouseDown(event, context, canvasEl); };
+      canvasEl.onmouseup = function(_) { onMouseUp(canvasEl); };
+    &lt;/<span style="color: #c678dd;">script</span>&gt;
+  &lt;/<span style="color: #c678dd;">body</span>&gt;
+&lt;/<span style="color: #c678dd;">html</span>&gt;
+</pre>
+</div>
+
+<p>
+Now we have everything we need to complete our <code>onLoadFunction</code>. In it, we&rsquo;ll do all our initial one-time setup: draw the grid and establish mouse events.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript" id="org9be229e"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">onLoadFunction</span>() {
+    resetCanvas();
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">canvasEl</span> = document.getElementById(<span style="color: #98be65;">"canvas"</span>);
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">context</span> = canvasEl.getContext(<span style="color: #98be65;">"2d"</span>);
+    canvasEl.onmousemove = <span style="color: #51afef;">function</span>(<span style="color: #dcaeea;">event</span>) { onMouseMove(event, context, canvasEl); };
+    canvasEl.onmousedown = <span style="color: #51afef;">function</span>(<span style="color: #dcaeea;">event</span>) { onMouseDown(event, context, canvasEl); };
+    canvasEl.onmouseup = <span style="color: #51afef;">function</span>(<span style="color: #dcaeea;">_</span>) { onMouseUp(canvasEl); };
+}
+</pre>
+</div>
+
+<p>
+For the functionality of clearing the canvas to reset our drawing, we&rsquo;ll simple re-draw the grid and clear out the variable that stores which squares of the grid were colored.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript" id="orgdd4c82d"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">resetCanvas</span>() {
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">canvasEl</span> = document.getElementById(<span style="color: #98be65;">"canvas"</span>);
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">context</span> = canvasEl.getContext(<span style="color: #98be65;">"2d"</span>);
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">gridSize</span> = Math.pow((CANVAS_WIDTH / SCALED_PIXEL_WIDTH), <span style="color: #da8548; font-weight: bold;">2</span>);
+    pixelData = [];
+    <span style="color: #51afef;">while</span> (gridSize--) pixelData.push(<span style="color: #da8548; font-weight: bold;">0</span>);
+    console.log(pixelData);
+    drawGrid(context);
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-javascript" id="orgda59034"><span style="color: #51afef;">const</span> <span style="color: #dcaeea;">GRID_STROKE_COLOR</span> = <span style="color: #98be65;">"blue"</span>;
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">BACKGROUND_COLOR</span> = <span style="color: #98be65;">"black"</span>;
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">STROKE_COLOR</span> = <span style="color: #98be65;">"white"</span>;
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">CANVAS_WIDTH</span> = <span style="color: #da8548; font-weight: bold;">200</span>;
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">GRID_WIDTH</span> = <span style="color: #da8548; font-weight: bold;">10</span>;
+<span style="color: #5B6268;">// </span><span style="color: #5B6268;">We'll draw on a 10 x 10 grid.</span>
+<span style="color: #5B6268;">// </span><span style="color: #5B6268;">CANVAS_WIDTH divided by 10 GRID_WIDTH equals 20 pixels per grid block.</span>
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">SCALED_PIXEL_WIDTH</span> = CANVAS_WIDTH / GRID_WIDTH;
+<span style="color: #51afef;">let</span> <span style="color: #dcaeea;">pixelData</span> = [];
+<span style="color: #51afef;">function</span> <span style="color: #c678dd;">drawGrid</span>(<span style="color: #dcaeea;">ctx</span>) {
+    ctx.fillStyle = BACKGROUND_COLOR;
+    ctx.fillRect(<span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">0</span>, CANVAS_WIDTH, CANVAS_WIDTH);
+    ctx.strokeStyle = GRID_STROKE_COLOR;
+    <span style="color: #51afef;">for</span> (
+        <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">x</span> = SCALED_PIXEL_WIDTH, <span style="color: #dcaeea;">y</span> = SCALED_PIXEL_WIDTH;
+        x &lt; CANVAS_WIDTH;
+        x += SCALED_PIXEL_WIDTH, y += SCALED_PIXEL_WIDTH
+    ) {
+        ctx.beginPath();
+        ctx.moveTo(x, <span style="color: #da8548; font-weight: bold;">0</span>);
+        ctx.lineTo(x, CANVAS_WIDTH);
+        ctx.moveTo(<span style="color: #da8548; font-weight: bold;">0</span>, y);
+        ctx.lineTo(CANVAS_WIDTH, y);
+        ctx.stroke();
+    }
+};
+<span style="color: #51afef;">function</span> <span style="color: #c678dd;">fillSquare</span>(<span style="color: #dcaeea;">mouseEvent</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvasElement</span>) {
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">boundingRect</span> = canvasElement.getBoundingClientRect();
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">x</span> = mouseEvent.clientX - boundingRect.x;
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">y</span> = mouseEvent.clientY - boundingRect.y;
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">xPixel</span> = Math.floor(x / SCALED_PIXEL_WIDTH);
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">yPixel</span> = Math.floor(y / SCALED_PIXEL_WIDTH);
+    context.fillStyle = STROKE_COLOR;
+    context.fillRect(
+        xPixel * SCALED_PIXEL_WIDTH,
+        yPixel * SCALED_PIXEL_WIDTH,
+        SCALED_PIXEL_WIDTH,
+        SCALED_PIXEL_WIDTH
+    );
+    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">Along with coloring the square in the grid,</span>
+    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">we also want to store the information that we colored</span>
+    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">a particular pixel in our pixelData that we'll later</span>
+    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">send to a server to either train our model or make</span>
+    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">a prediction.</span>
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">pixelIndex</span> = yPixel * GRID_WIDTH + xPixel;
+    pixelData[pixelIndex] = <span style="color: #da8548; font-weight: bold;">1</span>;
+    console.log(pixelData);
+}
+<span style="color: #51afef;">function</span> <span style="color: #c678dd;">onMouseDown</span>(<span style="color: #dcaeea;">event</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvas</span>) {
+    canvas.isDrawing = <span style="color: #a9a1e1;">true</span>;
+    fillSquare(event, context, canvas);
+}
+
+<span style="color: #51afef;">function</span> <span style="color: #c678dd;">onMouseUp</span>(<span style="color: #dcaeea;">canvas</span>) {
+    canvas.isDrawing = <span style="color: #a9a1e1;">false</span>;
+}
+
+<span style="color: #51afef;">function</span> <span style="color: #c678dd;">onMouseMove</span>(<span style="color: #dcaeea;">event</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvas</span>) {
+    <span style="color: #51afef;">if</span> (!canvas.isDrawing) {
+        <span style="color: #51afef;">return</span>;
+    }
+    fillSquare(event, context, canvas);
+}
+<span style="color: #51afef;">function</span> <span style="color: #c678dd;">onLoadFunction</span>() {
+    resetCanvas();
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">canvasEl</span> = document.getElementById(<span style="color: #98be65;">"canvas"</span>);
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">context</span> = canvasEl.getContext(<span style="color: #98be65;">"2d"</span>);
+    canvasEl.onmousemove = <span style="color: #51afef;">function</span>(<span style="color: #dcaeea;">event</span>) { onMouseMove(event, context, canvasEl); };
+    canvasEl.onmousedown = <span style="color: #51afef;">function</span>(<span style="color: #dcaeea;">event</span>) { onMouseDown(event, context, canvasEl); };
+    canvasEl.onmouseup = <span style="color: #51afef;">function</span>(<span style="color: #dcaeea;">_</span>) { onMouseUp(canvasEl); };
+}
+<span style="color: #51afef;">function</span> <span style="color: #c678dd;">resetCanvas</span>() {
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">canvasEl</span> = document.getElementById(<span style="color: #98be65;">"canvas"</span>);
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">context</span> = canvasEl.getContext(<span style="color: #98be65;">"2d"</span>);
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">gridSize</span> = Math.pow((CANVAS_WIDTH / SCALED_PIXEL_WIDTH), <span style="color: #da8548; font-weight: bold;">2</span>);
+    pixelData = [];
+    <span style="color: #51afef;">while</span> (gridSize--) pixelData.push(<span style="color: #da8548; font-weight: bold;">0</span>);
+    console.log(pixelData);
+    drawGrid(context);
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Eric Ihli</p>
+<p class="date">Created: 2021-01-19 Tue 13:15</p>
+</div>
+</body>
+</html>

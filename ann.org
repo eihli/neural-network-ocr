@@ -1,0 +1,508 @@
+#+TITLE: Artificial Neural Network From Scratch
+
+* HTML
+
+- Canvas on which to draw numbers
+- Buttons to:
+  - reset the canvas
+  - add the drawing and its labeled digit to the training data
+  - predict what number the drawing represents
+
+The canvas needs to be big enough to draw on with a mouse. On my desktop, a square with sides of 200 pixels seems reasonable.
+
+But if while we are drawing we only colored the exact pixel under the mouse cursor then the line would be incredibly thin. Therefore instead of treating the 200 x 200 square canvas as 200 x 200 pixels, we should set a scaled pixel width so instead of coloring a single pixel we color an N by N block of pixels.
+
+The details of the pixel coloring/scaling will be handled in some Javascript later. For now, let's just create an HTML file to work with.
+
+#+BEGIN_SRC html :tangle ocr.html
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script src="ocr.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="ocr.css" type="text/css" media="screen" />
+    <title>OCR Demo</title>
+  </head>
+  <body onload="ocrDemo.onLoadFunction()">
+    <div id="main-container" style="text-align: center;">
+      <h1>OCR Demo</h1>
+      <canvas id="canvas" width="200" height="200"></canvas>
+      <form name="input">
+        <label for="digit">Digit:</label>
+        <input type="text" id="digit">
+        <input type="button" value="Train" onclick="ocrDemo.train()">
+        <input type="button" value="Predict" onclick="ocrDemo.predict()">
+        <input type="button" value="Reset" onclick="ocrDemo.resetCanvas()">
+      </form>
+    </div>
+  </body>
+</html>
+#+END_SRC
+
+* Javascript
+
+You'll see the stylesheet linked in the HTML is called ~ocr.js~. Let's create that.
+
+In the body tag, we have an ~onload~ handler that calls ~ocrDemo.onLoadFunction()~. That will
+be the start of the ~ocr.js~ file. But we'll finish the details later.
+
+Javascript treats everything defined outside of a function as being in the global namespace. It's a bad habit to pollute the global namespace with things that aren't necessary. So we'll put most of our code inside a function and only put what we absolutely need to in the global namespace.
+
+
+#+NAME: ocr.js
+#+BEGIN_SRC javascript :tangle ocr.js :noweb no-export
+let ocrDemo = (function() {
+    <<javascript constants>>
+    <<drawGrid>>
+    <<fillSquare>>
+    <<mouse events>>
+    <<onLoadFunction>>
+    <<resetCanvas>>
+    <<sendData>>
+    <<train>>
+    <<predict>>
+    return {
+        onLoadFunction,
+        train,
+        predict,
+        resetCanvas
+    };
+})();
+#+END_SRC
+
+** Drawing the grid on canvas
+
+Let's define some constants for coloring the canvas.
+
+#+BEGIN_SRC javascript :noweb-ref "javascript constants"
+const GRID_STROKE_COLOR = "blue";
+const BACKGROUND_COLOR = "black";
+const STROKE_COLOR = "white";
+const CANVAS_WIDTH = 200;
+const GRID_WIDTH = 20;
+// We'll draw on a 20 x 20 grid.
+// CANVAS_WIDTH divided by 20 GRID_WIDTH equals 10 pixels per grid block.
+const SCALED_PIXEL_WIDTH = CANVAS_WIDTH / GRID_WIDTH;
+const HOST = "localhost";
+const PORT = "8888";
+#+END_SRC
+
+We also need a variable to store the information regarding which pixels make up the drawn number.
+
+#+BEGIN_SRC javascript :noweb-ref "javascript constants"
+let pixelData = [];
+#+END_SRC
+
+Any time we draw a fresh grid, we'll want to fill the entire canvas with the background color and then re-draw the lines of the grid.
+
+#+NAME: drawGrid
+#+BEGIN_SRC javascript
+function drawGrid(ctx) {
+    ctx.fillStyle = BACKGROUND_COLOR;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_WIDTH);
+    ctx.strokeStyle = GRID_STROKE_COLOR;
+    for (
+        let x = SCALED_PIXEL_WIDTH, y = SCALED_PIXEL_WIDTH;
+        x < CANVAS_WIDTH;
+        x += SCALED_PIXEL_WIDTH, y += SCALED_PIXEL_WIDTH
+    ) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, CANVAS_WIDTH);
+        ctx.moveTo(0, y);
+        ctx.lineTo(CANVAS_WIDTH, y);
+        ctx.stroke();
+    }
+};
+#+END_SRC
+
+Let's see what the grid looks like at [[./drawGridExample.html]]
+
+#+NAME: draw grid example
+#+BEGIN_SRC html :tangle drawGridExample.html :noweb no-export
+<html>
+  <body>
+    <canvas id="canvas" width="200" height="200"></canvas>
+    <script>
+      <<javascript constants>>
+      <<drawGrid>>
+      let canvasEl = document.getElementById("canvas");
+      let context = canvasEl.getContext("2d");
+      drawGrid(context);
+    </script>
+  </body>
+</html>
+#+END_SRC
+
+** Drawing on the grid
+
+Let's write a function that will take a mouse event and a canvas element and will fill a square of the grid.
+
+Mouse events have a ~clientX~ and ~clientY~ property that represent the pixel coordinates of the mouse. Those coordinates are relative to the applications viewport. For example, clicking on the left edge of the viewable area of a page will always result in a mouse event with a ~clientX~ of ~0~, regardless of whether the page is scrolled horizontally.
+
+We also need to know where the canvas element is in relation to the viewport so that we can draw in the correct square of the grid. Elements have a ~getBoundingClientRect()~ function that returns an object that has ~x~ and ~y~ properties denoting the pixel positions of their left-most and top-most edges.
+
+If the left edge of the canvas is ~100~ pixels to the right of the left edge of the viewport, and if a mouse event has a ~clientX~ between ~100~ and ~120~, then we know the mouse is in the first column of squares of the grid.
+
+#+NAME: fillSquare
+#+BEGIN_SRC javascript
+function fillSquare(mouseEvent, context, canvasElement) {
+    let boundingRect = canvasElement.getBoundingClientRect();
+    let x = mouseEvent.clientX - boundingRect.x;
+    let y = mouseEvent.clientY - boundingRect.y;
+    let xPixel = Math.floor(x / SCALED_PIXEL_WIDTH);
+    let yPixel = Math.floor(y / SCALED_PIXEL_WIDTH);
+    context.fillStyle = STROKE_COLOR;
+    context.fillRect(
+        xPixel * SCALED_PIXEL_WIDTH,
+        yPixel * SCALED_PIXEL_WIDTH,
+        SCALED_PIXEL_WIDTH,
+        SCALED_PIXEL_WIDTH
+    );
+    // Along with coloring the square in the grid,
+    // we also want to store the information that we colored
+    // a particular pixel in our pixelData that we'll later
+    // send to a server to either train our model or make
+    // a prediction.
+    let pixelIndex = yPixel * GRID_WIDTH + xPixel;
+    pixelData[pixelIndex] = 1;
+}
+#+END_SRC
+
+#+NAME: mouse events
+#+BEGIN_SRC javascript
+function onMouseDown(event, context, canvas) {
+    canvas.isDrawing = true;
+    fillSquare(event, context, canvas);
+}
+
+function onMouseUp(canvas) {
+    canvas.isDrawing = false;
+}
+
+function onMouseMove(event, context, canvas) {
+    if (!canvas.isDrawing) {
+        return;
+    }
+    fillSquare(event, context, canvas);
+}
+#+END_SRC
+
+Let's try it out! See [[./mouseEventsExample.html]]
+
+#+BEGIN_SRC html :tangle mouseEventsExample.html :noweb no-export
+<html>
+  <body>
+    <canvas id="canvas" width="200" height="200"></canvas>
+    <script>
+      <<javascript constants>>
+      <<drawGrid>>
+      let canvasEl = document.getElementById("canvas");
+      let context = canvasEl.getContext("2d");
+      drawGrid(context);
+
+      <<fillSquare>>
+      <<mouse events>>
+      canvasEl.onmousemove = function(event) { onMouseMove(event, context, canvasEl); };
+      canvasEl.onmousedown = function(event) { onMouseDown(event, context, canvasEl); };
+      canvasEl.onmouseup = function(_) { onMouseUp(canvasEl); };
+    </script>
+  </body>
+</html>
+#+END_SRC
+
+Now we have everything we need to complete our ~onLoadFunction~. In it, we'll do all our initial one-time setup: draw the grid and establish mouse events.
+
+#+NAME: onLoadFunction
+#+BEGIN_SRC javascript :noweb no-export
+function onLoadFunction() {
+    resetCanvas();
+    let canvasEl = document.getElementById("canvas");
+    let context = canvasEl.getContext("2d");
+    canvasEl.onmousemove = function(event) { onMouseMove(event, context, canvasEl); };
+    canvasEl.onmousedown = function(event) { onMouseDown(event, context, canvasEl); };
+    canvasEl.onmouseup = function(_) { onMouseUp(canvasEl); };
+}
+#+END_SRC
+
+For the functionality of clearing the canvas to reset our drawing, we'll simple re-draw the grid and clear out the variable that stores which squares of the grid were colored.
+
+#+NAME: resetCanvas
+#+BEGIN_SRC javascript
+function resetCanvas() {
+    let canvasEl = document.getElementById("canvas");
+    let context = canvasEl.getContext("2d");
+    let gridSize = Math.pow((CANVAS_WIDTH / SCALED_PIXEL_WIDTH), 2);
+    pixelData = [];
+    while (gridSize--) pixelData.push(0);
+    console.log(pixelData);
+    drawGrid(context);
+}
+#+END_SRC
+
+** Sending data to the server
+
+#+NAME: server communication
+#+BEGIN_SRC javascript
+<<sendData>>
+<<train>>
+<<predict>>
+#+END_SRC
+
+#+NAME: sendData
+#+BEGIN_SRC javascript
+function sendData(json) {
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", `http://${HOST}:${PORT}`);
+    xhr.onload = function() {
+        if (xhr.status == 200) {
+            let responseJSON = JSON.parse(xhr.responseText);
+            if (responseJSON && responseJSON.type == "predict") {
+                alert(`The neural network predicts you wrote a '${responseJSON.result}'`)
+            }
+        } else {
+            alert(`Server returned status ${xhr.status}.`);
+        }
+    };
+    xhr.onerror = function() {
+        alert(`Error occured while connecting to server: ${xhr.target.statusText}`);
+    };
+    let msg = JSON.stringify(json);
+    xhr.setRequestHeader("Content-Length", msg.length);
+    xhr.setRequestHeader("Connection", "close");
+    xhr.send(msg);
+}
+#+END_SRC
+
+#+NAME: train
+#+BEGIN_SRC javascript
+function train() {
+    let digitValue = document.getElementById("digit").value;
+    if (!digitValue.match(/^\d/)) {
+        alert("Please type and draw a digit in order to train the network.");
+        return;
+    }
+    let json = {
+        image: pixelData,
+        label: digitValue
+    };
+    sendData(json);
+}
+#+END_SRC
+
+#+NAME: predict
+#+BEGIN_SRC javascript
+function predict() {
+    if (pixelData.indexOf(1) < 0) {
+        alert("Please draw a digit in order to use prediction.");
+    } else {
+        let json = {
+            image: pixelData,
+            predict: true
+        };
+        sendData(json);
+    }
+}
+#+END_SRC
+
+* Python Server
+
+#+BEGIN_SRC python :tangle server.py
+import http.server
+import json
+import numpy as np
+from functools import partial
+
+HOST_NAME = "localhost"
+PORT_NUMBER = 8888
+HIDDEN_NODE_COUNT = 15
+
+
+class JSONHandler(http.server.SimpleHTTPRequestHandler):
+    def do_POST(self):
+        response_code = 200
+        response = ""
+        content_len = int(self.headers.get("Content-Length", 0))
+        content = self.rfile.read(content_len)
+        payload = json.loads(content)
+        if self.path == "/train":
+            response_code = 200
+        elif self.path == "/predict":
+            response_code = 200
+            response = {"type": "predict", "result": 9}
+        else:
+            response_code = 404
+        self.send_response(response_code)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        if response:
+            self.wfile.write(json.dumps(response).encode("utf-8"))
+
+def main():
+    print(f"Serving HTTP on {HOST_NAME} port {PORT_NUMBER}")
+    httpd = http.server.HTTPServer((HOST_NAME, PORT_NUMBER), partial(JSONHandler, directory="."))
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    else:
+        print("Unexpected server exception occurred.")
+    finally:
+        httpd.server_close()
+
+if __name__ == "__main__":
+    main()
+#+END_SRC
+
+#+BEGIN_SRC python
+import BaseHTTPServer
+import json
+import numpy as np
+HOST_NAME = "localhost"
+PORT_NUMBER = 8888
+HIDDEN_NODE_COUNT = 15
+
+with open("data.csv", "rb") as f:
+    data_matrix = np.loadtxt(f, delimiter = ",").tolist()
+with open("data_lables.csv", "rb") as f:
+    data_labels = np.loadtxt(f).tolist()
+#+END_SRC
+
+* Neural Network
+
+** Requirements
+
+Matplotlib and Numpy are two external requirements we'll need.
+
+#+BEGIN_SRC plaintext :tangle requirements.txt
+matplotlib
+numpy
+#+END_SRC
+
+** What is an Artificial Neural Network?
+
+*** The "Model" *is* the weights...
+
+** Implementing a single Perceptron
+
+** How to tell if data is linealy seperable?
+
+*** XOR example
+
+** Initialize random weights
+
+~np.random.rand~ creates a matrix of random values between [0, 1). The arguments passed are the sizes of each dimension. ~np.random.rand(2, 3)~ will create a 2x3 matrix of random values.
+
+Each dimension is a numpy array. Numpy arrays behave uniquely with math operators in that the operation is performed on each element of the array.
+
+So ~x~ in the generator below will be a numpy array that looks like ~[0.13328, 0.83111, ...]~ and multiplying ~x~ by ~0.12~ will multiply every element in that numpy array by ~0.12~. The generator is operating on each row and the math operations are operating on each element in the row.
+
+#+NAME: define initialize random weights
+#+BEGIN_SRC python
+def _initialize_random_weights(self, size_in, size_out):
+    """
+    Creates a matrix with `size_in` rows and `size_out` columns.
+    Values will be randomized between -0.06 and 0.06.
+    """
+    return np.random.rand(size_in, size_out) * 0.12 - 0.06
+#+END_SRC
+
+
+#+BEGIN_SRC python :noweb yes
+import csv
+from collections import namedtuple
+import math
+import random
+import os
+import json
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import numpy as np
+
+class OCRNeuralNetwork:
+    LEARNING_RATE = 0.1
+    NEURAL_NETWORK_FILE_PATH = "neural_network.json"
+    def __init__(self, num_hidden_nodes, data_matrix, data_labels, training_indices, use_file=True):
+        self.sigmoid = np.vectorize(self._sigmoid_scalar)
+        self.sigmoid_prime = np.vectorize(self._sigmoid_prime_scalar)
+        self.theta = 0
+        if not os.path.isfile(self.NEURAL_NETWORK_FILE_PATH):
+            self.theta1 = self._initialize_random_weights(400, num_hidden_nodes)
+            self.theta2 = self._initialize_random_weights(num_hidden_nodes, 10)
+            self.input_layer_bias = np.random.rand(num_hidden_nodes) * 0.12 - 0.06
+            self.hidden_layer_bias = np.random.rand(10) * 0.12 - 0.06
+
+    <<define initialize random weights>>
+
+    def _sigmoid_scalar(self, z):
+        """Activation function."""
+        return 1 / (1 + math.e ** -z)
+
+    def _sigmoid_prime_scalar(self, z):
+        return self.sigmoid(z) * (1 - self.sigmoid(z))
+
+    def forward_propagate(self, input_vals):
+        input_vals = np.array(input_vals)
+        y1 = np.dot(input_vals, self.theta1)
+        y1 = y1 + self.input_layer_bias
+
+        y2 = np.dot(y1, self.theta2)
+        y2 = y2 + self.hidden_layer_bias
+        y2 = self.sigmoid(y2)
+        # Returns each layer
+        return [y1, y2]
+
+    def predict(self, test):
+        output_node_vals = self.forward_propagate(test)
+        return output_node_vals
+
+    def train(self, training_data):
+        for data in training_data:
+            hidden_layer_node_vals, output_node_vals = self.forward_propagate(data["y0"])
+
+            # Back propagate
+            actual_vals = np.zeros(10)
+            actual_vals[data["label"]] = 1
+            output_errors = actual_vals - output_node_vals
+            hidden_errors = np.multiply(
+                self.theta2, output_errors,
+                self.sigmoid_prime(hidden_layer_node_vals)
+            )
+
+            # Update weights
+            self.theta1 += self.LEARNING_RATE * (hidden_errors * data["y0"])
+            self.theta2 += self.LEARNING_RATE * (output_errors * hidden_layer_node_vals)
+            self.hidden_layer_bias += self.LEARNING_RATE * output_errors
+            self.input_layer_bias += self.LEARNING_RATE * hidden_errors
+
+    def save(self):
+        """
+        We need to work with Numpy "array" types, but the `json` library
+        that we use to serialize/deserialize doesn't know about Numpy types.
+        So, we serialize things as regular python types, like lists, and then
+        deserialize them the same way, and then convert them back to Numpy types.
+        """
+        json_neural_network = {
+            "theta1": self.theta1.tolist(),
+            "theta2": self.theta2.tolist(),
+            "bias1": self.input_layer_bias.tolist(),
+            "bias2": self.hidden_layer_bias.tolist(),
+        }
+        with open(self.NEURAL_NETWORK_FILE_PATH) as f:
+            json.dump(json_neural_network, f)
+
+    def load(self):
+        """
+        We need to work with Numpy "array" types, but the `json` library
+        that we use to serialize/deserialize doesn't know about Numpy types.
+        So, we serialize things as regular python types, like lists, and then
+        deserialize them the same way, and then convert them back to Numpy types.
+        """
+        if not os.path.isfile(self.NEURAL_NETWORK_FILE_PATH):
+            return
+        with open(self.NEURAL_NETWORK_FILE_PATH) as f:
+            neural_network = json.load(f)
+        self.theta1 = np.array(neural_network["theta1"])
+        self.theta2 = np.array(neural_network["theta2"])
+        self.input_layer_bias = np.array(neural_network["bias1"])
+        self.hidden_layer_bias = np.array(neural_network["bias2"])
+#+END_SRC
