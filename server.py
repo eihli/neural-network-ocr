@@ -3,9 +3,13 @@ import json
 import numpy as np
 from functools import partial
 
+import nn
+
 HOST_NAME = "localhost"
 PORT_NUMBER = 8888
-HIDDEN_NODE_COUNT = 15
+HIDDEN_NODE_COUNT = 20
+
+neural_network = nn.OCRNeuralNetwork(784, 20, 10)
 
 
 class JSONHandler(http.server.SimpleHTTPRequestHandler):
@@ -16,10 +20,17 @@ class JSONHandler(http.server.SimpleHTTPRequestHandler):
         content = self.rfile.read(content_len)
         payload = json.loads(content)
         if self.path == "/train":
+            neural_network.back_propagate(np.array(payload["image"]), int(payload["label"]))
             response_code = 200
         elif self.path == "/predict":
             response_code = 200
-            response = {"type": "predict", "result": 9}
+            predictions = neural_network.predict(np.array(payload["image"]))
+            print(predictions)
+            prediction = max(predictions)
+            response = {"type": "predict", "result": predictions.tolist().index(prediction)}
+        elif self.path == "/initialize":
+            response_code = 200
+            neural_network.initialize()
         else:
             response_code = 404
         self.send_response(response_code)

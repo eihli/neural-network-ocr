@@ -62,7 +62,7 @@ We'll need:
   - add the drawing and its labeled digit to the training data
   - predict what number the drawing represents
 
-#+BEGIN_SRC html :tangle ocr.html :mkdirp yes :noweb yes
+#+BEGIN_SRC html :tangle iteration-1/ocr.html :mkdirp yes :noweb yes
 <html>
   <head>
     <meta charset="UTF-8">
@@ -96,7 +96,7 @@ be the start of the ~ocr.js~ file. But we'll finish the details later.
 Javascript treats everything defined outside of a function as being in the global namespace. It's a bad habit to pollute the global namespace with things that aren't necessary. So we'll put most of our code inside a function and only put what we absolutely need to in the global namespace.
 
 #+NAME: ocr.js
-#+BEGIN_SRC javascript :tangle ocr.js :noweb no-export
+#+BEGIN_SRC javascript :tangle iteration-1/ocr.js :noweb no-export
 let ocrDemo = (function() {
     <<javascript constants>>
     <<drawGrid>>
@@ -122,13 +122,11 @@ Let's define some constants for coloring the canvas.
 
 #+BEGIN_SRC javascript :noweb-ref "javascript constants"
 const GRID_STROKE_COLOR = "blue";
-const BACKGROUND_COLOR = "black";
-const STROKE_COLOR = "white";
-const PIXEL_WIDTH = 8
-const GRID_WIDTH = 28;
+const BACKGROUND_COLOR = "white";
+const STROKE_COLOR = "black";
+const PIXEL_WIDTH = 50
+const GRID_WIDTH = 3;
 const CANVAS_WIDTH = PIXEL_WIDTH * GRID_WIDTH;
-const HOST = "localhost";
-const PORT = "8888";
 #+END_SRC
 
 Any time we draw a fresh grid, we'll want to fill the entire canvas with the background color and then re-draw the lines of the grid.
@@ -155,7 +153,7 @@ function drawGrid(ctx) {
 #+END_SRC
 
 #+NAME: draw grid example
-#+BEGIN_SRC html :tangle drawGridExample.html :noweb no-export
+#+BEGIN_SRC html :tangle iteration-1/drawGridExample.html :noweb no-export
 <html>
   <body>
     <canvas id="canvas" width="200" height="200"></canvas>
@@ -170,10 +168,10 @@ function drawGrid(ctx) {
 </html>
 #+END_SRC
 
-Let's see what the grid looks like at [[./drawGridExample.html]]
+Let's see what the grid looks like at [[./iteration-1/drawGridExample.html]]
 
 #+begin_export html
-<iframe src="drawGridExample.html"></iframe>
+<iframe src="iteration-1/drawGridExample.html"></iframe>
 #+end_export
 
 ** Drawing on the grid
@@ -224,9 +222,9 @@ function onMouseMove(event, context, canvas) {
 }
 #+END_SRC
 
-Let's try it out! See [[./mouseEventsExample.html]]
+Let's try it out! See [[./iteration-1/mouseEventsExample.html]]
 
-#+BEGIN_SRC html :tangle mouseEventsExample.html :noweb no-export
+#+BEGIN_SRC html :tangle iteration-1/mouseEventsExample.html :noweb no-export
 <html>
   <body>
     <canvas id="canvas" width="200" height="200"></canvas>
@@ -341,9 +339,9 @@ function resetCanvas() {
 
 #+NAME: sendData
 #+BEGIN_SRC javascript
-function sendData(path, json) {
+function sendData(json) {
     let xhr = new XMLHttpRequest();
-    xhr.open("POST", `http://${HOST}:${PORT}/${path}`);
+    xhr.open("POST", `http://${HOST}:${PORT}`);
     xhr.onload = function() {
         if (xhr.status == 200) {
             let responseJSON = JSON.parse(xhr.responseText);
@@ -376,7 +374,7 @@ function train() {
         image: pixelData,
         label: digitValue
     };
-    sendData("train", json);
+    sendData(json);
 }
 #+END_SRC
 
@@ -388,8 +386,9 @@ function predict() {
     } else {
         let json = {
             image: pixelData,
+            predict: true
         };
-        sendData("predict", json);
+        sendData(json);
     }
 }
 #+END_SRC
@@ -402,13 +401,9 @@ import json
 import numpy as np
 from functools import partial
 
-import nn
-
 HOST_NAME = "localhost"
 PORT_NUMBER = 8888
-HIDDEN_NODE_COUNT = 20
-
-neural_network = nn.OCRNeuralNetwork(784, 20, 10)
+HIDDEN_NODE_COUNT = 15
 
 
 class JSONHandler(http.server.SimpleHTTPRequestHandler):
@@ -419,17 +414,10 @@ class JSONHandler(http.server.SimpleHTTPRequestHandler):
         content = self.rfile.read(content_len)
         payload = json.loads(content)
         if self.path == "/train":
-            neural_network.back_propagate(np.array(payload["image"]), int(payload["label"]))
             response_code = 200
         elif self.path == "/predict":
             response_code = 200
-            predictions = neural_network.predict(np.array(payload["image"]))
-            print(predictions)
-            prediction = max(predictions)
-            response = {"type": "predict", "result": predictions.tolist().index(prediction)}
-        elif self.path == "/initialize":
-            response_code = 200
-            neural_network.initialize()
+            response = {"type": "predict", "result": 9}
         else:
             response_code = 404
         self.send_response(response_code)
@@ -743,6 +731,7 @@ def _initialize_random_weights(self, size_in, size_out):
     Creates a matrix with `size_in` rows and `size_out` columns.
     Values will be randomized between -0.06 and 0.06.
     """
+    return np.zeros((size_in, size_out))
     return np.random.rand(size_in, size_out) * 0.12 - 0.06
 #+END_SRC
 
@@ -771,46 +760,30 @@ class OCRNeuralNetwork:
         self.num_input_nodes = num_input_nodes
         self.num_hidden_nodes = num_hidden_nodes
         self.num_output_nodes = num_output_nodes
-        self.__sigmoid = np.vectorize(self._sigmoid_scalar)
-        self.__sigmoid_prime = np.vectorize(self._sigmoid_prime_scalar)
+        self.sigmoid = np.vectorize(self._sigmoid_scalar)
+        self.sigmoid_prime = np.vectorize(self._sigmoid_prime_scalar)
         if not os.path.isfile(self.NEURAL_NETWORK_FILE_PATH):
             self.theta1 = self._initialize_random_weights(num_input_nodes, num_hidden_nodes)
             self.theta2 = self._initialize_random_weights(num_hidden_nodes, num_output_nodes)
-            self.input_layer_bias = np.random.rand(num_hidden_nodes) * 0.012 - 0.006
-            self.hidden_layer_bias = np.random.rand(num_output_nodes) * 0.012 - 0.006
+            self.input_layer_bias = np.random.rand(num_hidden_nodes) * 0.12 - 0.06
+            self.hidden_layer_bias = np.random.rand(num_output_nodes) * 0.12 - 0.06
 
     <<define initialize random weights>>
-
-    def sigmoid(self, z):
-        return self.__sigmoid(np.clip(z, 100, 100))
 
     def _sigmoid_scalar(self, z):
         """Activation function."""
         return 1 / (1 + math.e ** -z)
 
-    def sigmoid_prime(self, z):
-        return self.__sigmoid_prime(np.clip(z, 100, 100))
-
     def _sigmoid_prime_scalar(self, z):
         return self.sigmoid(z) * (1 - self.sigmoid(z))
-
-    def initialize(self):
-        with open("mnist_train.csv", "rb") as f:
-            data_matrix = np.loadtxt(f, delimiter=",", skiprows=1)
-        data_labels = data_matrix[:1000,0]
-        data_matrix = data_matrix[:1000,1:]
-        data_matrix = np.where(data_matrix > 160, 1, 0)
-        data_with_labels = list(zip(data_matrix, data_labels))
-        random.shuffle(data_with_labels)
-        for data, label in data_with_labels:
-            self.back_propagate(data, int(label))
 
     def forward_propagate(self, input_vals):
         input_vals = np.array(input_vals)
         y1 = np.dot(input_vals, self.theta1)
-        y1 = self.sigmoid(y1)
+        y1 = y1 + self.input_layer_bias
 
         y2 = np.dot(y1, self.theta2)
+        y2 = y2 + self.hidden_layer_bias
         y2 = self.sigmoid(y2)
         return y2
 
@@ -825,11 +798,13 @@ class OCRNeuralNetwork:
         # Save off this pre-activation value. We need it later.
         hidden_layer_pre_activations = (
             np.dot(input_data, self.theta1)
+            + self.input_layer_bias
         )
         hidden_layer_activations = self.sigmoid(hidden_layer_pre_activations)
 
         output_layer_pre_activations = (
-            np.dot(hidden_layer_activations, self.theta2)
+            np.dot(self.theta2.T, hidden_layer_activations)
+            + self.hidden_layer_bias
         )
         output_layer_activations = self.sigmoid(output_layer_pre_activations)
         self.output_layer_activations = output_layer_activations
@@ -848,18 +823,22 @@ class OCRNeuralNetwork:
         rate_of_change_of_error_with_respect_to_final_weights = np.dot(
             (
                 errors_of_output_layer
-                ,* self.sigmoid_prime(output_layer_activations)
+                ,* self.sigmoid_prime(output_layer_pre_activations)
             ).reshape(-1, 1),
             hidden_layer_activations.reshape(1, -1)
         ).T
         self.rate_of_change_of_error_with_respect_to_final_weights = (
             rate_of_change_of_error_with_respect_to_final_weights
         )
+        self.theta2 += (
+            self.LEARNING_RATE
+            ,* rate_of_change_of_error_with_respect_to_final_weights
+        )
 
         # 1 x num_hidden_nodes
         errors_of_hidden_layer = np.dot(
             errors_of_output_layer
-            ,* self.sigmoid_prime(output_layer_activations),
+            ,* self.sigmoid_prime(output_layer_pre_activations),
             self.theta2.T
         )
         # num_hidden_nodes x num_input_nodes
@@ -867,15 +846,10 @@ class OCRNeuralNetwork:
         rate_of_change_of_error_with_respect_to_first_weights = (
             (
                 errors_of_hidden_layer  # 1 x num_hidden_nodes
-                ,* self.sigmoid_prime(hidden_layer_activations)  # 1 x num_hidden_nodes
+                ,* self.sigmoid_prime(hidden_layer_pre_activations)  # 1 x num_hidden_nodes
             ).reshape(-1, 1)  # num_hidden_nodes x 1
             ,* input_data.reshape(1, -1)  # 1 x num_input_nodes
         ).T
-
-        self.theta2 += (
-            self.LEARNING_RATE
-            ,* rate_of_change_of_error_with_respect_to_final_weights
-        )
         self.theta1 += (
             self.LEARNING_RATE
             ,* rate_of_change_of_error_with_respect_to_first_weights

@@ -1,0 +1,88 @@
+#+TITLE: Python Neural Network From Scratch
+
+* Weights
+
+** On a scale of 0 to 50, how important to you is machine learning?
+
+  40... I still have to eat and sleep.
+
+** What about exercise? How much downwards would you adjust machine learning's importance to account for not just eating and sleeping, but also for exercise?
+
+Good point. Maybe I'd adjust it down 5 points to 35.
+
+** Great. What if someone else uses a different scale and you want to compare your numbers with them. What if their scale is 0 to 100? If you said "Exercise is 5 points of importance", would you be accurately conveying to them how important exercise is to you?
+
+No. 5 points for me on my 0 to 50 scale is not the same as 5 points to someone on a 0 to 100 scale.
+
+Maybe we should use percentages instead.
+
+If I said exercise is 10% importance, then everyone will know how important it is to me regardless of what scale they are using.
+
+** How could eating, sleeping, exercsing, and machine learning be evenly divided into the 24 hours of a day?
+
+#+begin_example
+[                    24 hours                  ]
+
+[eating,  sleeping,  exercising,  machine learning]
+
+[    8h,        8h,          8h,                8h]
+[   25%,       25%,         25%,               25%]
+#+end_example
+
+** Good. We have a baseline. But those numbers aren't representative of you. How could you adjust each timespan so that it represents the importance of each task for you?
+
+* Neural Network
+
+#+begin_src python
+false_and_false_input = [0, 0]
+true_and_false_input  = [1, 0]
+false_and_true_input  = [0, 1]
+true_and_true_input   = [1, 1]
+
+false_and_false_target_output = 0
+true_and_false_target_output  = 0
+false_and_true_target_output  = 0
+true_and_true_target_output   = 1
+
+weighted_importance_of_first_input_node  = 0.0
+weighted_importance_of_second_input_node = 0.0
+weights = [
+    weighted_importance_of_first_input_node,
+    weighted_importance_of_second_input_node,
+]
+
+def multiply_input_nodes_by_weight_nodes(input_nodes, weight_nodes):
+    running_total = 0
+    for i in range(len(input_nodes)):
+        running_total += input_nodes[i] * weight_nodes[i]
+    return running_total
+
+all_inputs = [
+    false_and_false_input,
+    false_and_true_input,
+    true_and_false_input,
+    true_and_true_input,
+]
+
+all_target_outputs = [
+    false_and_false_target_output,
+    true_and_false_target_output,
+    false_and_true_target_output,
+    true_and_true_target_output,
+]
+
+results_of_multiplying_inputs_by_weights = []
+for input_nodes in all_inputs:
+    results_of_multiplying_inputs_by_weights.append(
+        multiply_input_nodes_by_weight_nodes(input_nodes, weights)
+    )
+
+difference_between_calculated_results_and_target_results = []
+for i in range(len(results_of_multiplying_inputs_by_weights)):
+    difference_between_calculated_results_and_target_results.append(
+        all_target_outputs[i]
+        - results_of_multiplying_inputs_by_weights[i]
+    )
+
+print(difference_between_calculated_results_and_target_results)
+#+end_src
