@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-01-19 Tue 13:15 -->
+<!-- 2021-02-17 Wed 21:48 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Artificial Neural Network From Scratch</title>
@@ -40,7 +40,7 @@
   }
   pre.src {
     position: relative;
-    overflow: visible;
+    overflow: auto;
     padding-top: 1.2em;
   }
   pre.src:before {
@@ -52,7 +52,7 @@
     padding: 3px;
     border: 1px solid black;
   }
-  pre.src:hover:before { display: inline;}
+  pre.src:hover:before { display: inline; margin-top: 14px;}
   /* Languages per Org manual */
   pre.src-asymptote:before { content: 'Asymptote'; }
   pre.src-awk:before { content: 'Awk'; }
@@ -194,25 +194,23 @@
   /*]]>*/-->
 </style>
 <script type="text/javascript">
-// @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-v3-or-Later
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
 <!--/*--><![CDATA[/*><!--*/
      function CodeHighlightOn(elem, id)
      {
        var target = document.getElementById(id);
        if(null != target) {
-         elem.cacheClassElem = elem.className;
-         elem.cacheClassTarget = target.className;
-         target.className = "code-highlighted";
-         elem.className   = "code-highlighted";
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
        }
      }
      function CodeHighlightOff(elem, id)
      {
        var target = document.getElementById(id);
-       if(elem.cacheClassElem)
-         elem.className = elem.cacheClassElem;
-       if(elem.cacheClassTarget)
-         target.className = elem.cacheClassTarget;
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
      }
     /*]]>*///-->
 // @license-end
@@ -225,20 +223,141 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgf208438">1. HTML</a></li>
-<li><a href="#orgb7c704b">2. Javascript</a>
+<li><a href="#orge747831">1. A Simple And Intuitive Guide To Neural Networks (Python, HTML, Javascript)</a></li>
+<li><a href="#org1bbbfc8">2. Iteration 1</a>
 <ul>
-<li><a href="#org4cdb455">2.1. Drawing the grid on canvas</a></li>
-<li><a href="#org82c6504">2.2. Drawing on the grid</a></li>
+<li><a href="#org94607b9">2.1. HTML</a></li>
+</ul>
+</li>
+<li><a href="#orgfda8df3">3. Javascript</a>
+<ul>
+<li><a href="#org1eb17ee">3.1. Drawing the grid on canvas</a></li>
+<li><a href="#org5e81230">3.2. Drawing on the grid</a></li>
+<li><a href="#orgf346b2e">3.3. Sending data to the server</a></li>
+</ul>
+</li>
+<li><a href="#orgcf291df">4. Python Server</a></li>
+<li><a href="#org39a8177">5. Neural Network</a>
+<ul>
+<li><a href="#orge337903">5.1. Requirements</a></li>
+<li><a href="#org3737b37">5.2. What is an Artificial Neural Network?</a>
+<ul>
+<li><a href="#org8517498">5.2.1. The &ldquo;Model&rdquo; <b>is</b> the weights&#x2026;</a></li>
+</ul>
+</li>
+<li><a href="#org7465a2d">5.3. Implementing a single Perceptron</a></li>
+<li><a href="#orgd3d3091">5.4. How to tell if data is linealy seperable?</a>
+<ul>
+<li><a href="#org6aa344d">5.4.1. XOR example</a></li>
+</ul>
+</li>
+<li><a href="#org6677255">5.5. Backpropagation</a>
+<ul>
+<li><a href="#org9369e69">5.5.1. Imports</a></li>
+<li><a href="#orgdd43d28">5.5.2. Helper</a></li>
+</ul>
+</li>
+<li><a href="#org852e3f1">5.6. Initialize random weights</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgf208438" class="outline-2">
-<h2 id="orgf208438"><span class="section-number-2">1</span> HTML</h2>
+<div id="outline-container-orge747831" class="outline-2">
+<h2 id="orge747831"><span class="section-number-2">1</span> A Simple And Intuitive Guide To Neural Networks (Python, HTML, Javascript)</h2>
 <div class="outline-text-2" id="text-1">
+<p>
+You can create a webpage in HTML and Javascript that will let you draw a number, and you can write the server software and a neural network to tell you what number you drew.
+</p>
+
+<p>
+I won&rsquo;t use words like &ldquo;differentiable&rdquo;.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org1bbbfc8" class="outline-2">
+<h2 id="org1bbbfc8"><span class="section-number-2">2</span> Iteration 1</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org94607b9" class="outline-3">
+<h3 id="org94607b9"><span class="section-number-3">2.1</span> HTML</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+We need something to draw on.
+</p>
+
+<p>
+If you&rsquo;re not familiar with what a &ldquo;pixel&rdquo; is, take a moment to look that up.
+</p>
+
+<p>
+We are going to start with the simplest &ldquo;canvas&rdquo; that can represent &ldquo;one&rdquo; and &ldquo;zero&rdquo; in any meaningful way.
+</p>
+
+<p>
+It will be canvas of 3 pixels wide by 3 pixels high.
+</p>
+
+<pre class="example" id="orgc5cf38e">
+000
+000
+000
+</pre>
+
+<p>
+Our &ldquo;pencil&rdquo; will turn the pixels from 0 to 1.
+</p>
+
+<p>
+An ideal zero in this 3x3 grid will look like this:
+</p>
+
+<pre class="example" id="org0889307">
+111
+101
+111
+</pre>
+
+<p>
+And an ideal one will look like this:
+</p>
+
+<pre class="example" id="org0fd4a23">
+010
+010
+010
+</pre>
+
+<p>
+But since we are presenting this canvas to users to draw on, the pixels can&rsquo;t literally be single pixels.
+</p>
+
+<p>
+We can take a chunk of pixels on screen, a 50x50 square of pixels for example, and treat that entire chunk as a single pixel.
+</p>
+
+<p>
+So we&rsquo;ll display a 3x3 grid that represents 9 of our pixels, but they will be represented on screen as a 3x3 grid of 50x50 &ldquo;actual monitor&rdquo; pixels.
+</p>
+
+<p>
+In the end, it will look like this:
+</p>
+
+<p>
+TODO: INSERT IFRAME
+</p>
+
+<p>
+The details of the pixel coloring/scaling will be handled in some Javascript later. For now, let&rsquo;s just create an HTML file to work with.
+</p>
+
+<p>
+We&rsquo;ll need:
+</p>
+
 <ul class="org-ul">
 <li>Canvas on which to draw numbers</li>
 <li>Buttons to:
@@ -248,18 +367,6 @@
 <li>predict what number the drawing represents</li>
 </ul></li>
 </ul>
-
-<p>
-The canvas needs to be big enough to draw on with a mouse. On my desktop, a square with sides of 200 pixels seems reasonable.
-</p>
-
-<p>
-But if while we are drawing we only colored the exact pixel under the mouse cursor then the line would be incredibly thin. Therefore instead of treating the 200 x 200 square canvas as 200 x 200 pixels, we should set a scaled pixel width so instead of coloring a single pixel we color an N by N block of pixels.
-</p>
-
-<p>
-The details of the pixel coloring/scaling will be handled in some Javascript later. For now, let&rsquo;s just create an HTML file to work with.
-</p>
 
 <div class="org-src-container">
 <pre class="src src-html">&lt;<span style="color: #c678dd;">html</span>&gt;
@@ -277,7 +384,7 @@ The details of the pixel coloring/scaling will be handled in some Javascript lat
         &lt;<span style="color: #c678dd;">label</span> <span style="color: #dcaeea;">for</span>=<span style="color: #98be65;">"digit"</span>&gt;Digit:&lt;/<span style="color: #c678dd;">label</span>&gt;
         &lt;<span style="color: #c678dd;">input</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"text"</span> <span style="color: #dcaeea;">id</span>=<span style="color: #98be65;">"digit"</span>&gt;
         &lt;<span style="color: #c678dd;">input</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"button"</span> <span style="color: #dcaeea;">value</span>=<span style="color: #98be65;">"Train"</span> <span style="color: #dcaeea;">onclick</span>=<span style="color: #98be65;">"ocrDemo.train()"</span>&gt;
-        &lt;<span style="color: #c678dd;">input</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"button"</span> <span style="color: #dcaeea;">value</span>=<span style="color: #98be65;">"Test"</span> <span style="color: #dcaeea;">onclick</span>=<span style="color: #98be65;">"ocrDemo.test()"</span>&gt;
+        &lt;<span style="color: #c678dd;">input</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"button"</span> <span style="color: #dcaeea;">value</span>=<span style="color: #98be65;">"Predict"</span> <span style="color: #dcaeea;">onclick</span>=<span style="color: #98be65;">"ocrDemo.predict()"</span>&gt;
         &lt;<span style="color: #c678dd;">input</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"button"</span> <span style="color: #dcaeea;">value</span>=<span style="color: #98be65;">"Reset"</span> <span style="color: #dcaeea;">onclick</span>=<span style="color: #98be65;">"ocrDemo.resetCanvas()"</span>&gt;
       &lt;/<span style="color: #c678dd;">form</span>&gt;
     &lt;/<span style="color: #c678dd;">div</span>&gt;
@@ -287,10 +394,11 @@ The details of the pixel coloring/scaling will be handled in some Javascript lat
 </div>
 </div>
 </div>
+</div>
 
-<div id="outline-container-orgb7c704b" class="outline-2">
-<h2 id="orgb7c704b"><span class="section-number-2">2</span> Javascript</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-orgfda8df3" class="outline-2">
+<h2 id="orgfda8df3"><span class="section-number-2">3</span> Javascript</h2>
+<div class="outline-text-2" id="text-3">
 <p>
 You&rsquo;ll see the stylesheet linked in the HTML is called <code>ocr.js</code>. Let&rsquo;s create that.
 </p>
@@ -305,10 +413,20 @@ Javascript treats everything defined outside of a function as being in the globa
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="org38a6cd2"><span style="color: #51afef;">let</span> <span style="color: #dcaeea;">ocrDemo</span> = (<span style="color: #51afef;">function</span>() {
-    &lt;&lt;javascript ocr functionality&gt;&gt;
+<pre class="src src-javascript" id="org3442695"><span style="color: #51afef;">let</span> <span style="color: #dcaeea;">ocrDemo</span> = (<span style="color: #51afef;">function</span>() {
+    &lt;&lt;javascript constants&gt;&gt;
+    &lt;&lt;drawGrid&gt;&gt;
+    &lt;&lt;fillSquare&gt;&gt;
+    &lt;&lt;mouse events&gt;&gt;
+    &lt;&lt;onLoadFunction&gt;&gt;
+    &lt;&lt;resetCanvas&gt;&gt;
+    &lt;&lt;sendData&gt;&gt;
+    &lt;&lt;train&gt;&gt;
+    &lt;&lt;predict&gt;&gt;
     <span style="color: #51afef;">return</span> {
         onLoadFunction,
+        train,
+        predict,
         resetCanvas
     };
 })();
@@ -316,31 +434,20 @@ Javascript treats everything defined outside of a function as being in the globa
 </div>
 </div>
 
-<div id="outline-container-org4cdb455" class="outline-3">
-<h3 id="org4cdb455"><span class="section-number-3">2.1</span> Drawing the grid on canvas</h3>
-<div class="outline-text-3" id="text-2-1">
+<div id="outline-container-org1eb17ee" class="outline-3">
+<h3 id="org1eb17ee"><span class="section-number-3">3.1</span> Drawing the grid on canvas</h3>
+<div class="outline-text-3" id="text-3-1">
 <p>
 Let&rsquo;s define some constants for coloring the canvas.
 </p>
 
 <div class="org-src-container">
 <pre class="src src-javascript"><span style="color: #51afef;">const</span> <span style="color: #dcaeea;">GRID_STROKE_COLOR</span> = <span style="color: #98be65;">"blue"</span>;
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">BACKGROUND_COLOR</span> = <span style="color: #98be65;">"black"</span>;
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">STROKE_COLOR</span> = <span style="color: #98be65;">"white"</span>;
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">CANVAS_WIDTH</span> = <span style="color: #da8548; font-weight: bold;">200</span>;
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">GRID_WIDTH</span> = <span style="color: #da8548; font-weight: bold;">10</span>;
-<span style="color: #5B6268;">// </span><span style="color: #5B6268;">We'll draw on a 10 x 10 grid.</span>
-<span style="color: #5B6268;">// </span><span style="color: #5B6268;">CANVAS_WIDTH divided by 10 GRID_WIDTH equals 20 pixels per grid block.</span>
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">SCALED_PIXEL_WIDTH</span> = CANVAS_WIDTH / GRID_WIDTH;
-</pre>
-</div>
-
-<p>
-We also need a variable to store the information regarding which pixels make up the drawn number.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #51afef;">let</span> <span style="color: #dcaeea;">pixelData</span> = [];
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">BACKGROUND_COLOR</span> = <span style="color: #98be65;">"white"</span>;
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">STROKE_COLOR</span> = <span style="color: #98be65;">"black"</span>;
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">PIXEL_WIDTH</span> = <span style="color: #da8548; font-weight: bold;">50</span>
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">GRID_WIDTH</span> = <span style="color: #da8548; font-weight: bold;">3</span>;
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">CANVAS_WIDTH</span> = PIXEL_WIDTH * GRID_WIDTH;
 </pre>
 </div>
 
@@ -349,14 +456,14 @@ Any time we draw a fresh grid, we&rsquo;ll want to fill the entire canvas with t
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="orgcee4b62"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">drawGrid</span>(<span style="color: #dcaeea;">ctx</span>) {
+<pre class="src src-javascript" id="org518125c"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">drawGrid</span>(<span style="color: #dcaeea;">ctx</span>) {
     ctx.fillStyle = BACKGROUND_COLOR;
     ctx.fillRect(<span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">0</span>, CANVAS_WIDTH, CANVAS_WIDTH);
     ctx.strokeStyle = GRID_STROKE_COLOR;
     <span style="color: #51afef;">for</span> (
-        <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">x</span> = SCALED_PIXEL_WIDTH, <span style="color: #dcaeea;">y</span> = SCALED_PIXEL_WIDTH;
+        <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">x</span> = PIXEL_WIDTH, <span style="color: #dcaeea;">y</span> = PIXEL_WIDTH;
         x &lt; CANVAS_WIDTH;
-        x += SCALED_PIXEL_WIDTH, y += SCALED_PIXEL_WIDTH
+        x += PIXEL_WIDTH, y += PIXEL_WIDTH
     ) {
         ctx.beginPath();
         ctx.moveTo(x, <span style="color: #da8548; font-weight: bold;">0</span>);
@@ -369,12 +476,8 @@ Any time we draw a fresh grid, we&rsquo;ll want to fill the entire canvas with t
 </pre>
 </div>
 
-<p>
-Let&rsquo;s see what the grid looks like at <a href="./drawGridExample.html">./drawGridExample.html</a>
-</p>
-
 <div class="org-src-container">
-<pre class="src src-html" id="org057d05f">&lt;<span style="color: #c678dd;">html</span>&gt;
+<pre class="src src-html" id="org5e29d39">&lt;<span style="color: #c678dd;">html</span>&gt;
   &lt;<span style="color: #c678dd;">body</span>&gt;
     &lt;<span style="color: #c678dd;">canvas</span> <span style="color: #dcaeea;">id</span>=<span style="color: #98be65;">"canvas"</span> <span style="color: #dcaeea;">width</span>=<span style="color: #98be65;">"200"</span> <span style="color: #dcaeea;">height</span>=<span style="color: #98be65;">"200"</span>&gt;&lt;/<span style="color: #c678dd;">canvas</span>&gt;
     &lt;<span style="color: #c678dd;">script</span>&gt;
@@ -388,12 +491,18 @@ Let&rsquo;s see what the grid looks like at <a href="./drawGridExample.html">./d
 &lt;/<span style="color: #c678dd;">html</span>&gt;
 </pre>
 </div>
+
+<p>
+Let&rsquo;s see what the grid looks like at <a href="./iteration-1/drawGridExample.html">./iteration-1/drawGridExample.html</a>
+</p>
+
+<iframe src="iteration-1/drawGridExample.html"></iframe>
 </div>
 </div>
 
-<div id="outline-container-org82c6504" class="outline-3">
-<h3 id="org82c6504"><span class="section-number-3">2.2</span> Drawing on the grid</h3>
-<div class="outline-text-3" id="text-2-2">
+<div id="outline-container-org5e81230" class="outline-3">
+<h3 id="org5e81230"><span class="section-number-3">3.2</span> Drawing on the grid</h3>
+<div class="outline-text-3" id="text-3-2">
 <p>
 Let&rsquo;s write a function that will take a mouse event and a canvas element and will fill a square of the grid.
 </p>
@@ -411,33 +520,27 @@ If the left edge of the canvas is <code>100</code> pixels to the right of the le
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="org87ebd4d"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">fillSquare</span>(<span style="color: #dcaeea;">mouseEvent</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvasElement</span>) {
+<pre class="src src-javascript" id="org8a49074"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">fillSquare</span>(<span style="color: #dcaeea;">mouseEvent</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvasElement</span>) {
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">boundingRect</span> = canvasElement.getBoundingClientRect();
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">x</span> = mouseEvent.clientX - boundingRect.x;
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">y</span> = mouseEvent.clientY - boundingRect.y;
-    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">xPixel</span> = Math.floor(x / SCALED_PIXEL_WIDTH);
-    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">yPixel</span> = Math.floor(y / SCALED_PIXEL_WIDTH);
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">xPixel</span> = Math.floor(x / PIXEL_WIDTH);
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">yPixel</span> = Math.floor(y / PIXEL_WIDTH);
     context.fillStyle = STROKE_COLOR;
     context.fillRect(
-        xPixel * SCALED_PIXEL_WIDTH,
-        yPixel * SCALED_PIXEL_WIDTH,
-        SCALED_PIXEL_WIDTH,
-        SCALED_PIXEL_WIDTH
+        xPixel * PIXEL_WIDTH,
+        yPixel * PIXEL_WIDTH,
+        PIXEL_WIDTH,
+        PIXEL_WIDTH
     );
-    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">Along with coloring the square in the grid,</span>
-    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">we also want to store the information that we colored</span>
-    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">a particular pixel in our pixelData that we'll later</span>
-    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">send to a server to either train our model or make</span>
-    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">a prediction.</span>
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">pixelIndex</span> = yPixel * GRID_WIDTH + xPixel;
     pixelData[pixelIndex] = <span style="color: #da8548; font-weight: bold;">1</span>;
-    console.log(pixelData);
 }
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="org2f7c8e6"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">onMouseDown</span>(<span style="color: #dcaeea;">event</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvas</span>) {
+<pre class="src src-javascript" id="orgeffdae1"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">onMouseDown</span>(<span style="color: #dcaeea;">event</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvas</span>) {
     canvas.isDrawing = <span style="color: #a9a1e1;">true</span>;
     fillSquare(event, context, canvas);
 }
@@ -456,7 +559,7 @@ If the left edge of the canvas is <code>100</code> pixels to the right of the le
 </div>
 
 <p>
-Let&rsquo;s try it out! See <a href="./mouseEventsExample.html">./mouseEventsExample.html</a>
+Let&rsquo;s try it out! See <a href="./iteration-1/mouseEventsExample.html">./iteration-1/mouseEventsExample.html</a>
 </p>
 
 <div class="org-src-container">
@@ -482,11 +585,88 @@ Let&rsquo;s try it out! See <a href="./mouseEventsExample.html">./mouseEventsExa
 </div>
 
 <p>
+We also need a variable to store the information regarding which pixels make up the drawn number.
+</p>
+
+<p>
+We can imagine each row in the grid as being a list of values of either <code>1</code> or <code>0</code>.
+</p>
+
+<p>
+If there is ink in the pixel, then the pixel will be represented in the list as <code>1</code>.
+</p>
+
+<p>
+If there is no ink coloring the pixel, then the value will be <code>0</code>.
+</p>
+
+<p>
+So, if our zero looks like this:
+</p>
+
+<pre class="example" id="org662317d">
+111
+101
+111
+</pre>
+
+<p>
+Then the list representing the first row will be:
+</p>
+
+<pre class="example" id="org8aac864">
+[1, 1, 1]
+</pre>
+
+<p>
+And the list representing the second row will be:
+</p>
+
+<pre class="example" id="orgb17b1e2">
+[1, 0, 1]
+</pre>
+
+<p>
+And we can combine each of the three rows into an list of lists:
+</p>
+
+<pre class="example" id="org8af9eda">
+[[1, 1, 1],
+ [1, 0, 1],
+ [1, 1, 1]]
+</pre>
+
+<p>
+We may eventually need to treat this data in a different structure. But this list of lists is convenient for now.
+</p>
+
+<p>
+It will start off empty. Every pixel will have a value of <code>0</code>, representing that there is no &ldquo;ink&rdquo; on the canvas. No number has been drawn.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript"><span style="color: #51afef;">let</span> <span style="color: #dcaeea;">pixelData</span> = [[<span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">0</span>],
+                 [<span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">0</span>],
+                 [<span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">0</span>]];
+</pre>
+</div>
+
+<p>
+Along with coloring the square in the grid, we also want to store the information that we colored a particular pixel in our pixelData that we&rsquo;ll later send to a server to either train our model or make a prediction.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript" id="orga53e29d"><span style="color: #51afef;">let</span> <span style="color: #dcaeea;">pixelIndex</span> = yPixel * GRID_WIDTH + xPixel;
+pixelData[pixelIndex] = <span style="color: #da8548; font-weight: bold;">1</span>;
+</pre>
+</div>
+
+<p>
 Now we have everything we need to complete our <code>onLoadFunction</code>. In it, we&rsquo;ll do all our initial one-time setup: draw the grid and establish mouse events.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="org9be229e"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">onLoadFunction</span>() {
+<pre class="src src-javascript" id="orga6e09fd"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">onLoadFunction</span>() {
     resetCanvas();
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">canvasEl</span> = document.getElementById(<span style="color: #98be65;">"canvas"</span>);
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">context</span> = canvasEl.getContext(<span style="color: #98be65;">"2d"</span>);
@@ -502,10 +682,10 @@ For the functionality of clearing the canvas to reset our drawing, we&rsquo;ll s
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="orgdd4c82d"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">resetCanvas</span>() {
+<pre class="src src-javascript" id="org5411426"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">resetCanvas</span>() {
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">canvasEl</span> = document.getElementById(<span style="color: #98be65;">"canvas"</span>);
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">context</span> = canvasEl.getContext(<span style="color: #98be65;">"2d"</span>);
-    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">gridSize</span> = Math.pow((CANVAS_WIDTH / SCALED_PIXEL_WIDTH), <span style="color: #da8548; font-weight: bold;">2</span>);
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">gridSize</span> = Math.pow((CANVAS_WIDTH / PIXEL_WIDTH), <span style="color: #da8548; font-weight: bold;">2</span>);
     pixelData = [];
     <span style="color: #51afef;">while</span> (gridSize--) pixelData.push(<span style="color: #da8548; font-weight: bold;">0</span>);
     console.log(pixelData);
@@ -513,88 +693,569 @@ For the functionality of clearing the canvas to reset our drawing, we&rsquo;ll s
 }
 </pre>
 </div>
+</div>
+</div>
+
+<div id="outline-container-orgf346b2e" class="outline-3">
+<h3 id="orgf346b2e"><span class="section-number-3">3.3</span> Sending data to the server</h3>
+<div class="outline-text-3" id="text-3-3">
+<div class="org-src-container">
+<pre class="src src-javascript" id="org5b4d699">&lt;&lt;sendData&gt;&gt;
+&lt;&lt;train&gt;&gt;
+&lt;&lt;predict&gt;&gt;
+</pre>
+</div>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="orgda59034"><span style="color: #51afef;">const</span> <span style="color: #dcaeea;">GRID_STROKE_COLOR</span> = <span style="color: #98be65;">"blue"</span>;
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">BACKGROUND_COLOR</span> = <span style="color: #98be65;">"black"</span>;
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">STROKE_COLOR</span> = <span style="color: #98be65;">"white"</span>;
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">CANVAS_WIDTH</span> = <span style="color: #da8548; font-weight: bold;">200</span>;
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">GRID_WIDTH</span> = <span style="color: #da8548; font-weight: bold;">10</span>;
-<span style="color: #5B6268;">// </span><span style="color: #5B6268;">We'll draw on a 10 x 10 grid.</span>
-<span style="color: #5B6268;">// </span><span style="color: #5B6268;">CANVAS_WIDTH divided by 10 GRID_WIDTH equals 20 pixels per grid block.</span>
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">SCALED_PIXEL_WIDTH</span> = CANVAS_WIDTH / GRID_WIDTH;
-<span style="color: #51afef;">let</span> <span style="color: #dcaeea;">pixelData</span> = [];
-<span style="color: #51afef;">function</span> <span style="color: #c678dd;">drawGrid</span>(<span style="color: #dcaeea;">ctx</span>) {
-    ctx.fillStyle = BACKGROUND_COLOR;
-    ctx.fillRect(<span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">0</span>, CANVAS_WIDTH, CANVAS_WIDTH);
-    ctx.strokeStyle = GRID_STROKE_COLOR;
-    <span style="color: #51afef;">for</span> (
-        <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">x</span> = SCALED_PIXEL_WIDTH, <span style="color: #dcaeea;">y</span> = SCALED_PIXEL_WIDTH;
-        x &lt; CANVAS_WIDTH;
-        x += SCALED_PIXEL_WIDTH, y += SCALED_PIXEL_WIDTH
-    ) {
-        ctx.beginPath();
-        ctx.moveTo(x, <span style="color: #da8548; font-weight: bold;">0</span>);
-        ctx.lineTo(x, CANVAS_WIDTH);
-        ctx.moveTo(<span style="color: #da8548; font-weight: bold;">0</span>, y);
-        ctx.lineTo(CANVAS_WIDTH, y);
-        ctx.stroke();
-    }
-};
-<span style="color: #51afef;">function</span> <span style="color: #c678dd;">fillSquare</span>(<span style="color: #dcaeea;">mouseEvent</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvasElement</span>) {
-    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">boundingRect</span> = canvasElement.getBoundingClientRect();
-    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">x</span> = mouseEvent.clientX - boundingRect.x;
-    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">y</span> = mouseEvent.clientY - boundingRect.y;
-    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">xPixel</span> = Math.floor(x / SCALED_PIXEL_WIDTH);
-    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">yPixel</span> = Math.floor(y / SCALED_PIXEL_WIDTH);
-    context.fillStyle = STROKE_COLOR;
-    context.fillRect(
-        xPixel * SCALED_PIXEL_WIDTH,
-        yPixel * SCALED_PIXEL_WIDTH,
-        SCALED_PIXEL_WIDTH,
-        SCALED_PIXEL_WIDTH
-    );
-    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">Along with coloring the square in the grid,</span>
-    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">we also want to store the information that we colored</span>
-    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">a particular pixel in our pixelData that we'll later</span>
-    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">send to a server to either train our model or make</span>
-    <span style="color: #5B6268;">// </span><span style="color: #5B6268;">a prediction.</span>
-    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">pixelIndex</span> = yPixel * GRID_WIDTH + xPixel;
-    pixelData[pixelIndex] = <span style="color: #da8548; font-weight: bold;">1</span>;
-    console.log(pixelData);
+<pre class="src src-javascript" id="orgf33d9c3"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">sendData</span>(<span style="color: #dcaeea;">json</span>) {
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">xhr</span> = <span style="color: #51afef;">new</span> <span style="color: #ECBE7B;">XMLHttpRequest</span>();
+    xhr.open(<span style="color: #98be65;">"POST"</span>, <span style="color: #98be65;">`http://${HOST}:${PORT}`</span>);
+    xhr.onload = <span style="color: #51afef;">function</span>() {
+        <span style="color: #51afef;">if</span> (xhr.status == <span style="color: #da8548; font-weight: bold;">200</span>) {
+            <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">responseJSON</span> = JSON.parse(xhr.responseText);
+            <span style="color: #51afef;">if</span> (responseJSON &amp;&amp; responseJSON.type == <span style="color: #98be65;">"predict"</span>) {
+                alert(<span style="color: #98be65;">`The neural network predicts you wrote a '${responseJSON.result}'`</span>)
+            }
+        } <span style="color: #51afef;">else</span> {
+            alert(<span style="color: #98be65;">`Server returned status ${xhr.status}.`</span>);
+        }
+    };
+    xhr.onerror = <span style="color: #51afef;">function</span>() {
+        alert(<span style="color: #98be65;">`Error occured while connecting to server: ${xhr.target.statusText}`</span>);
+    };
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">msg</span> = JSON.stringify(json);
+    xhr.setRequestHeader(<span style="color: #98be65;">"Content-Length"</span>, msg.length);
+    xhr.setRequestHeader(<span style="color: #98be65;">"Connection"</span>, <span style="color: #98be65;">"close"</span>);
+    xhr.send(msg);
 }
-<span style="color: #51afef;">function</span> <span style="color: #c678dd;">onMouseDown</span>(<span style="color: #dcaeea;">event</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvas</span>) {
-    canvas.isDrawing = <span style="color: #a9a1e1;">true</span>;
-    fillSquare(event, context, canvas);
-}
+</pre>
+</div>
 
-<span style="color: #51afef;">function</span> <span style="color: #c678dd;">onMouseUp</span>(<span style="color: #dcaeea;">canvas</span>) {
-    canvas.isDrawing = <span style="color: #a9a1e1;">false</span>;
-}
-
-<span style="color: #51afef;">function</span> <span style="color: #c678dd;">onMouseMove</span>(<span style="color: #dcaeea;">event</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvas</span>) {
-    <span style="color: #51afef;">if</span> (!canvas.isDrawing) {
+<div class="org-src-container">
+<pre class="src src-javascript" id="org8e70b25"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">train</span>() {
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">digitValue</span> = document.getElementById(<span style="color: #98be65;">"digit"</span>).value;
+    <span style="color: #51afef;">if</span> (!digitValue.match(<span style="color: #98be65;">/^\d/</span>)) {
+        alert(<span style="color: #98be65;">"Please type and draw a digit in order to train the network."</span>);
         <span style="color: #51afef;">return</span>;
     }
-    fillSquare(event, context, canvas);
+    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">json</span> = {
+        image: pixelData,
+        label: digitValue
+    };
+    sendData(json);
 }
-<span style="color: #51afef;">function</span> <span style="color: #c678dd;">onLoadFunction</span>() {
-    resetCanvas();
-    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">canvasEl</span> = document.getElementById(<span style="color: #98be65;">"canvas"</span>);
-    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">context</span> = canvasEl.getContext(<span style="color: #98be65;">"2d"</span>);
-    canvasEl.onmousemove = <span style="color: #51afef;">function</span>(<span style="color: #dcaeea;">event</span>) { onMouseMove(event, context, canvasEl); };
-    canvasEl.onmousedown = <span style="color: #51afef;">function</span>(<span style="color: #dcaeea;">event</span>) { onMouseDown(event, context, canvasEl); };
-    canvasEl.onmouseup = <span style="color: #51afef;">function</span>(<span style="color: #dcaeea;">_</span>) { onMouseUp(canvasEl); };
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-javascript" id="orgea30e85"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">predict</span>() {
+    <span style="color: #51afef;">if</span> (pixelData.indexOf(<span style="color: #da8548; font-weight: bold;">1</span>) &lt; <span style="color: #da8548; font-weight: bold;">0</span>) {
+        alert(<span style="color: #98be65;">"Please draw a digit in order to use prediction."</span>);
+    } <span style="color: #51afef;">else</span> {
+        <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">json</span> = {
+            image: pixelData,
+            predict: <span style="color: #a9a1e1;">true</span>
+        };
+        sendData(json);
+    }
 }
-<span style="color: #51afef;">function</span> <span style="color: #c678dd;">resetCanvas</span>() {
-    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">canvasEl</span> = document.getElementById(<span style="color: #98be65;">"canvas"</span>);
-    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">context</span> = canvasEl.getContext(<span style="color: #98be65;">"2d"</span>);
-    <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">gridSize</span> = Math.pow((CANVAS_WIDTH / SCALED_PIXEL_WIDTH), <span style="color: #da8548; font-weight: bold;">2</span>);
-    pixelData = [];
-    <span style="color: #51afef;">while</span> (gridSize--) pixelData.push(<span style="color: #da8548; font-weight: bold;">0</span>);
-    console.log(pixelData);
-    drawGrid(context);
-}
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcf291df" class="outline-2">
+<h2 id="orgcf291df"><span class="section-number-2">4</span> Python Server</h2>
+<div class="outline-text-2" id="text-4">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #51afef;">import</span> http.server
+<span style="color: #51afef;">import</span> json
+<span style="color: #51afef;">import</span> numpy <span style="color: #51afef;">as</span> np
+<span style="color: #51afef;">from</span> functools <span style="color: #51afef;">import</span> partial
+
+<span style="color: #dcaeea;">HOST_NAME</span> = <span style="color: #98be65;">"localhost"</span>
+<span style="color: #dcaeea;">PORT_NUMBER</span> = <span style="color: #da8548; font-weight: bold;">8888</span>
+<span style="color: #dcaeea;">HIDDEN_NODE_COUNT</span> = <span style="color: #da8548; font-weight: bold;">15</span>
+
+
+<span style="color: #51afef;">class</span> <span style="color: #ECBE7B;">JSONHandler</span>(http.server.SimpleHTTPRequestHandler):
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">def</span> <span style="color: #c678dd;">do_POST</span>(<span style="color: #51afef;">self</span>):
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">response_code</span> = <span style="color: #da8548; font-weight: bold;">200</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">response</span> = <span style="color: #98be65;">""</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">content_len</span> = <span style="color: #c678dd;">int</span>(<span style="color: #51afef;">self</span>.headers.get(<span style="color: #98be65;">"Content-Length"</span>, <span style="color: #da8548; font-weight: bold;">0</span>))
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">content</span> = <span style="color: #51afef;">self</span>.rfile.read(content_len)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">payload</span> = json.loads(content)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">if</span> <span style="color: #51afef;">self</span>.path == <span style="color: #98be65;">"/train"</span>:
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">response_code</span> = <span style="color: #da8548; font-weight: bold;">200</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">elif</span> <span style="color: #51afef;">self</span>.path == <span style="color: #98be65;">"/predict"</span>:
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">response_code</span> = <span style="color: #da8548; font-weight: bold;">200</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">response</span> = {<span style="color: #98be65;">"type"</span>: <span style="color: #98be65;">"predict"</span>, <span style="color: #98be65;">"result"</span>: <span style="color: #da8548; font-weight: bold;">9</span>}
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">else</span>:
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">response_code</span> = <span style="color: #da8548; font-weight: bold;">404</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.send_response(response_code)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.send_header(<span style="color: #98be65;">"Content-Type"</span>, <span style="color: #98be65;">"application/json"</span>)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.end_headers()
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">if</span> response:
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.wfile.write(json.dumps(response).encode(<span style="color: #98be65;">"utf-8"</span>))
+
+<span style="color: #51afef;">def</span> <span style="color: #c678dd;">main</span>():
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Serving HTTP on {HOST_NAME} port {PORT_NUMBER}"</span>)
+<span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">httpd</span> = http.server.HTTPServer((HOST_NAME, PORT_NUMBER), partial(JSONHandler, directory=<span style="color: #98be65;">"."</span>))
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">try</span>:
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   httpd.serve_forever()
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">except</span> <span style="color: #ECBE7B;">KeyboardInterrupt</span>:
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">pass</span>
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">else</span>:
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">print</span>(<span style="color: #98be65;">"Unexpected server exception occurred."</span>)
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">finally</span>:
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   httpd.server_close()
+
+<span style="color: #51afef;">if</span> <span style="color: #c678dd;">__name__</span> == <span style="color: #98be65;">"__main__"</span>:
+<span style="background-color: #282c34;"> </span>   main()
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #51afef;">import</span> BaseHTTPServer
+<span style="color: #51afef;">import</span> json
+<span style="color: #51afef;">import</span> numpy <span style="color: #51afef;">as</span> np
+<span style="color: #dcaeea;">HOST_NAME</span> = <span style="color: #98be65;">"localhost"</span>
+<span style="color: #dcaeea;">PORT_NUMBER</span> = <span style="color: #da8548; font-weight: bold;">8888</span>
+<span style="color: #dcaeea;">HIDDEN_NODE_COUNT</span> = <span style="color: #da8548; font-weight: bold;">15</span>
+
+<span style="color: #51afef;">with</span> <span style="color: #c678dd;">open</span>(<span style="color: #98be65;">"data.csv"</span>, <span style="color: #98be65;">"rb"</span>) <span style="color: #51afef;">as</span> f:
+<span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">data_matrix</span> = np.loadtxt(f, delimiter = <span style="color: #98be65;">","</span>).tolist()
+<span style="color: #51afef;">with</span> <span style="color: #c678dd;">open</span>(<span style="color: #98be65;">"data_lables.csv"</span>, <span style="color: #98be65;">"rb"</span>) <span style="color: #51afef;">as</span> f:
+<span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">data_labels</span> = np.loadtxt(f).tolist()
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org39a8177" class="outline-2">
+<h2 id="org39a8177"><span class="section-number-2">5</span> Neural Network</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-orge337903" class="outline-3">
+<h3 id="orge337903"><span class="section-number-3">5.1</span> Requirements</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+Matplotlib and Numpy are two external requirements we&rsquo;ll need.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-plaintext">matplotlib
+numpy
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3737b37" class="outline-3">
+<h3 id="org3737b37"><span class="section-number-3">5.2</span> What is an Artificial Neural Network?</h3>
+<div class="outline-text-3" id="text-5-2">
+</div>
+<div id="outline-container-org8517498" class="outline-4">
+<h4 id="org8517498"><span class="section-number-4">5.2.1</span> The &ldquo;Model&rdquo; <b>is</b> the weights&#x2026;</h4>
+</div>
+</div>
+
+<div id="outline-container-org7465a2d" class="outline-3">
+<h3 id="org7465a2d"><span class="section-number-3">5.3</span> Implementing a single Perceptron</h3>
+</div>
+
+<div id="outline-container-orgd3d3091" class="outline-3">
+<h3 id="orgd3d3091"><span class="section-number-3">5.4</span> How to tell if data is linealy seperable?</h3>
+<div class="outline-text-3" id="text-5-4">
+</div>
+<div id="outline-container-org6aa344d" class="outline-4">
+<h4 id="org6aa344d"><span class="section-number-4">5.4.1</span> XOR example</h4>
+</div>
+</div>
+
+
+<div id="outline-container-org6677255" class="outline-3">
+<h3 id="org6677255"><span class="section-number-3">5.5</span> Backpropagation</h3>
+<div class="outline-text-3" id="text-5-5">
+<p>
+I want this code to be perfectly repeatable. But since we&rsquo;ll be initializing some random numbers, you&rsquo;re results might vary if you try to run this code. Therefore, let&rsquo;s give Numpy a specific seed for its random number generation so that we all get the same &ldquo;random&rdquo; numbers.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #51afef;">import</span> numpy <span style="color: #51afef;">as</span> np
+<span style="color: #51afef;">from</span> numpy.random <span style="color: #51afef;">import</span> MT19937
+
+<span style="color: #51afef;">from</span> numpy.random <span style="color: #51afef;">import</span> RandomState, SeedSequence
+<span style="color: #51afef;">def</span> <span style="color: #c678dd;">flatten</span>(l):
+<span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">result</span> = []
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">for</span> x <span style="color: #51afef;">in</span> l:
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">if</span> <span style="color: #51afef;">not</span> <span style="color: #c678dd;">isinstance</span>(x, <span style="color: #c678dd;">list</span>):
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   result.append(x)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">else</span>:
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   result.extend(flatten(x))
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">return</span> np.array(result)
+<span style="color: #dcaeea;">random_state</span> = RandomState(MT19937(SeedSequence(<span style="color: #da8548; font-weight: bold;">42</span>)))
+</pre>
+</div>
+
+<p>
+We want to predict whether a number is <code>0</code> or <code>1</code>.
+</p>
+
+<p>
+Input is a 3x3 grid. 9 values.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #dcaeea;">ideal_zero</span> = flatten([[<span style="color: #da8548; font-weight: bold;">1</span>, <span style="color: #da8548; font-weight: bold;">1</span>, <span style="color: #da8548; font-weight: bold;">1</span>],
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span> [<span style="color: #da8548; font-weight: bold;">1</span>, <span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">1</span>],
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span> [<span style="color: #da8548; font-weight: bold;">1</span>, <span style="color: #da8548; font-weight: bold;">1</span>, <span style="color: #da8548; font-weight: bold;">1</span>]])
+<span style="color: #dcaeea;">ideal_one</span>  = flatten([[<span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">1</span>, <span style="color: #da8548; font-weight: bold;">0</span>],
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span> [<span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">1</span>, <span style="color: #da8548; font-weight: bold;">0</span>],
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span> [<span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">1</span>, <span style="color: #da8548; font-weight: bold;">0</span>]])
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Truncated to 2 decimal places for nicer printing for examples.</span>
+<span style="color: #dcaeea;">vector_round</span> = np.vectorize(<span style="color: #c678dd;">round</span>)
+<span style="color: #dcaeea;">random_state</span> = RandomState(MT19937(SeedSequence(<span style="color: #da8548; font-weight: bold;">42</span>)))
+<span style="color: #dcaeea;">weights</span> = vector_round(random_state.rand(<span style="color: #da8548; font-weight: bold;">2</span>, <span style="color: #da8548; font-weight: bold;">9</span>), <span style="color: #da8548; font-weight: bold;">2</span>)
+
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Given the above, we want to adjust our weights such that:</span>
+<span style="color: #5B6268;">#</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">np.dot(weights, ideal_zero) == [1, 0]</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">and</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">np.dot(weights, ideal_one) == [0, 1]</span>
+<span style="color: #5B6268;">#</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">Or, more accurately...</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">prediction = np.dot(weights, ideal_zero)</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">prediction.index(max(prediction)) == 0</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">prediction = np.dot(weights, ideal_zero)</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">prediction.index(max(prediction)) == 1</span>
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Ideal zero: {ideal_zero}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Ideal one:  {ideal_one}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Weights (random):\n{weights}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Zero prediction: {np.dot(weights, ideal_zero)}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"One prediction:  {np.dot(weights, ideal_one)}"</span>)
+</pre>
+</div>
+
+<p>
+How can we adjust our weights so that <code>np.dot(weigts, ideal_zero)</code> is closer to <code>[1, 0]</code> than <code>[0, 1]</code>?
+</p>
+
+<p>
+We could hardcode some weights and get pretty close.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #dcaeea;">hardcoded_weights</span> = np.array([[<span style="color: #da8548; font-weight: bold;">0.2</span>, <span style="color: #da8548; font-weight: bold;">0.0</span>, <span style="color: #da8548; font-weight: bold;">0.2</span>, <span style="color: #da8548; font-weight: bold;">0.2</span>, <span style="color: #da8548; font-weight: bold;">0.0</span>, <span style="color: #da8548; font-weight: bold;">0.2</span>, <span style="color: #da8548; font-weight: bold;">0.2</span>, <span style="color: #da8548; font-weight: bold;">0.0</span>, <span style="color: #da8548; font-weight: bold;">0.2</span>],
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span> [<span style="color: #da8548; font-weight: bold;">0.0</span>, <span style="color: #da8548; font-weight: bold;">0.1</span>, <span style="color: #da8548; font-weight: bold;">0.0</span>, <span style="color: #da8548; font-weight: bold;">0.0</span>, <span style="color: #da8548; font-weight: bold;">0.9</span>, <span style="color: #da8548; font-weight: bold;">0.0</span>, <span style="color: #da8548; font-weight: bold;">0.0</span>, <span style="color: #da8548; font-weight: bold;">0.1</span>, <span style="color: #da8548; font-weight: bold;">0.0</span>]])
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Zero prediction: {np.dot(hardcoded_weights, ideal_zero)}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"One prediction:  {np.dot(hardcoded_weights, ideal_one)}"</span>)
+</pre>
+</div>
+
+<p>
+This gets us pretty close and is very intuitive.
+</p>
+
+<p>
+If we provide weight such that the output neuron for <code>1</code> gets a value clse to one when the middle pixel is &ldquo;on&rdquo;, then that gets us close to one.
+</p>
+
+<p>
+How do we programatically find the optimal values for those weights?
+</p>
+
+<p>
+Well, first we need to know how far away each value in that vector is from our ideal value so that we know which way we need to go.
+</p>
+
+<p>
+The function that tells us that is known as the &ldquo;cost&rdquo; function.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #51afef;">def</span> <span style="color: #c678dd;">errors</span>(calculated_values, target_values):
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">return</span> target_values - calculated_values
+
+<span style="color: #dcaeea;">random_state</span> = RandomState(MT19937(SeedSequence(<span style="color: #da8548; font-weight: bold;">42</span>)))
+<span style="color: #dcaeea;">weights</span> = vector_round(random_state.rand(<span style="color: #da8548; font-weight: bold;">2</span>, <span style="color: #da8548; font-weight: bold;">9</span>), <span style="color: #da8548; font-weight: bold;">2</span>)
+
+<span style="color: #dcaeea;">result_of_zero</span> = np.dot(weights, ideal_zero)
+<span style="color: #dcaeea;">expected_zero_output</span> = np.array([<span style="color: #da8548; font-weight: bold;">1</span>, <span style="color: #da8548; font-weight: bold;">0</span>])
+<span style="color: #dcaeea;">errors_of_zero</span> = errors(result_of_zero, expected_zero_output)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Result of zero: {result_of_zero}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Ideal zero:     {expected_zero_output}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Cost of zeros:  {errors_of_zero}"</span>)
+
+<span style="color: #dcaeea;">result_of_one</span> = np.dot(weights, ideal_one)
+<span style="color: #dcaeea;">expected_one_output</span> = np.array([<span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">1</span>])
+<span style="color: #dcaeea;">errors_of_one</span> = errors(result_of_one, expected_one_output)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Result of one: {result_of_one}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Ideal one:     {expected_one_output}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Cost of ones:  {errors_of_one}"</span>)
+</pre>
+</div>
+
+<p>
+This tells us something. It tells us how far off our results are. We don&rsquo;t know what to do with that yet. But at least we have a programatic way to quantify &ldquo;We need to lower the value of the &lsquo;zero&rsquo; output node twice as much as we need to lower the value of the &lsquo;one&rsquo; output node.&rdquo;
+</p>
+
+<p>
+We know we want to adjust our weights so that our prediction gets closer.
+</p>
+
+<p>
+We don&rsquo;t know whether to adjust our weights up or down. And we don&rsquo;t know by how much.
+</p>
+
+<p>
+Let&rsquo;s just pick a weight and adjust it up and see what happens. If our prediction gets more accurate, we know we&rsquo;re on the right track. If it gets less accurate, then we can simply move the other direction.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #51afef;">print</span>(weights)
+<span style="color: #dcaeea;">derivative_of_zero</span> = np.dot(errors_of_zero.reshape(-<span style="color: #da8548; font-weight: bold;">1</span>, <span style="color: #da8548; font-weight: bold;">1</span>), ideal_zero.reshape(<span style="color: #da8548; font-weight: bold;">1</span>, -<span style="color: #da8548; font-weight: bold;">1</span>))
+<span style="color: #51afef;">print</span>(derivative_of_zero)
+<span style="color: #dcaeea;">derivative_of_one</span> = np.dot(errors_of_one.reshape(-<span style="color: #da8548; font-weight: bold;">1</span>, <span style="color: #da8548; font-weight: bold;">1</span>), ideal_one.reshape(<span style="color: #da8548; font-weight: bold;">1</span>, -<span style="color: #da8548; font-weight: bold;">1</span>))
+<span style="color: #51afef;">print</span>(derivative_of_one)
+</pre>
+</div>
+
+<p>
+We have values that we can use to update our weights. Let&rsquo;s see what happens when we do that.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #dcaeea;">LEARNING_RATE</span> = <span style="color: #da8548; font-weight: bold;">0.1</span>
+<span style="color: #dcaeea;">weights_trained_once</span> = weights * derivative_of_zero * LEARNING_RATE
+<span style="color: #51afef;">print</span>((hardcoded_weights - weights).<span style="color: #c678dd;">sum</span>())
+<span style="color: #51afef;">print</span>((hardcoded_weights - weights_trained_once).<span style="color: #c678dd;">sum</span>())
+</pre>
+</div>
+
+<p>
+We are closer to our ideal hardcoded weights. Let&rsquo;s train it again.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #dcaeea;">result_of_zero_after_training_once</span> = np.dot(weights_trained_once, ideal_zero)
+<span style="color: #dcaeea;">errors_of_zero_after_training_once</span> = errors(
+<span style="background-color: #282c34;"> </span>   result_of_zero_after_training_once,
+<span style="background-color: #282c34;"> </span>   expected_zero_output
+)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Result of zero: {result_of_zero_after_training_once}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Ideal zero:     {expected_zero_output}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Cost of zeros after no training:    {errors_of_zero}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Cost of zeros after training once:  {errors_of_zero_after_training_once}"</span>)
+
+<span style="color: #dcaeea;">derivative_of_zero_after_training_once</span> = np.dot(
+<span style="background-color: #282c34;"> </span>   errors_of_zero_after_training_once.reshape(-<span style="color: #da8548; font-weight: bold;">1</span>, <span style="color: #da8548; font-weight: bold;">1</span>),
+<span style="background-color: #282c34;"> </span>   ideal_zero.reshape(<span style="color: #da8548; font-weight: bold;">1</span>, -<span style="color: #da8548; font-weight: bold;">1</span>)
+)
+<span style="color: #dcaeea;">weights_trained_twice</span> = (
+<span style="background-color: #282c34;"> </span>   weights
+<span style="background-color: #282c34;"> </span>   * derivative_of_zero_after_training_once
+<span style="background-color: #282c34;"> </span>   * LEARNING_RATE
+)
+
+<span style="color: #dcaeea;">result_of_zero_after_training_twice</span> = np.dot(weights_trained_twice, ideal_zero)
+<span style="color: #dcaeea;">errors_of_zero_after_training_twice</span> = errors(
+<span style="background-color: #282c34;"> </span>   result_of_zero_after_training_twice,
+<span style="background-color: #282c34;"> </span>   expected_zero_output
+)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Result of zero: {result_of_zero_after_training_twice}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Ideal zero:     {expected_zero_output}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Total error after no training:    {errors_of_zero.sum()}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Total error after training once:  {errors_of_zero_after_training_once.sum()}"</span>)
+<span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Total error after training twice: {errors_of_zero_after_training_twice.sum()}"</span>)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #51afef;">print</span>(f<span style="color: #98be65;">"Weights: \n{vector_round(weights_trained_twice, 2)}\n"</span>)
+</pre>
+</div>
+
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #51afef;">def</span> <span style="color: #c678dd;">cost</span>(calculated, target):
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">return</span> (calculated - target) ** <span style="color: #da8548; font-weight: bold;">2</span>
+
+<span style="color: #51afef;">def</span> <span style="color: #c678dd;">cost_prime</span>(weights, inputs, target):
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">return</span> <span style="color: #da8548; font-weight: bold;">2</span> * np.dot(weights, inputs) - <span style="color: #da8548; font-weight: bold;">2</span> * target
+
+<span style="color: #dcaeea;">adjustment</span> = np.dot(weights.T, errors_of_one)
+<span style="color: #dcaeea;">new_weights</span> = weights + <span style="color: #da8548; font-weight: bold;">0.1</span> * weights * adjustment
+<span style="color: #dcaeea;">new_weights</span> = np.array(vector_round(new_weights, <span style="color: #da8548; font-weight: bold;">2</span>))
+<span style="color: #51afef;">print</span>(weights)
+<span style="color: #51afef;">print</span>(new_weights)
+<span style="color: #51afef;">print</span>(np.array(hardcoded_weights))
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org9369e69" class="outline-4">
+<h4 id="org9369e69"><span class="section-number-4">5.5.1</span> Imports</h4>
+<div class="outline-text-4" id="text-5-5-1">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #51afef;">import</span> numpy <span style="color: #51afef;">as</span> np
+<span style="color: #51afef;">from</span> numpy.random <span style="color: #51afef;">import</span> MT19937
+
+<span style="color: #51afef;">from</span> numpy.random <span style="color: #51afef;">import</span> RandomState, SeedSequence
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgdd43d28" class="outline-4">
+<h4 id="orgdd43d28"><span class="section-number-4">5.5.2</span> Helper</h4>
+<div class="outline-text-4" id="text-5-5-2">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #51afef;">def</span> <span style="color: #c678dd;">flatten</span>(l):
+<span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">result</span> = []
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">for</span> x <span style="color: #51afef;">in</span> l:
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">if</span> <span style="color: #51afef;">not</span> <span style="color: #c678dd;">isinstance</span>(x, <span style="color: #c678dd;">list</span>):
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   result.append(x)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">else</span>:
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   result.extend(flatten(x))
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">return</span> np.array(result)
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org852e3f1" class="outline-3">
+<h3 id="org852e3f1"><span class="section-number-3">5.6</span> Initialize random weights</h3>
+<div class="outline-text-3" id="text-5-6">
+<p>
+<code>np.random.rand</code> creates a matrix of random values between [0, 1). The arguments passed are the sizes of each dimension. <code>np.random.rand(2, 3)</code> will create a 2x3 matrix of random values.
+</p>
+
+<p>
+Each dimension is a numpy array. Numpy arrays behave uniquely with math operators in that the operation is performed on each element of the array.
+</p>
+
+<p>
+So <code>x</code> in the generator below will be a numpy array that looks like <code>[0.13328, 0.83111, ...]</code> and multiplying <code>x</code> by <code>0.12</code> will multiply every element in that numpy array by <code>0.12</code>. The generator is operating on each row and the math operations are operating on each element in the row.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgab26f93"><span style="color: #51afef;">def</span> <span style="color: #c678dd;">_initialize_random_weights</span>(<span style="color: #51afef;">self</span>, size_in, size_out):
+<span style="background-color: #282c34;"> </span>   <span style="color: #83898d;">"""</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   Creates a matrix with `size_in` rows and `size_out` columns.</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   Values will be randomized between -0.06 and 0.06.</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   """</span>
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">return</span> np.random.rand(size_in, size_out) * <span style="color: #da8548; font-weight: bold;">0.12</span> - <span style="color: #da8548; font-weight: bold;">0.06</span>
+</pre>
+</div>
+
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #51afef;">import</span> csv
+<span style="color: #51afef;">from</span> collections <span style="color: #51afef;">import</span> namedtuple
+<span style="color: #51afef;">import</span> math
+<span style="color: #51afef;">import</span> random
+<span style="color: #51afef;">import</span> os
+<span style="color: #51afef;">import</span> json
+<span style="color: #51afef;">import</span> matplotlib.pyplot <span style="color: #51afef;">as</span> plt
+<span style="color: #51afef;">import</span> matplotlib.cm <span style="color: #51afef;">as</span> cm
+<span style="color: #51afef;">import</span> numpy <span style="color: #51afef;">as</span> np
+
+<span style="color: #51afef;">class</span> <span style="color: #ECBE7B;">OCRNeuralNetwork</span>:
+<span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">LEARNING_RATE</span> = <span style="color: #da8548; font-weight: bold;">0.1</span>
+<span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">NEURAL_NETWORK_FILE_PATH</span> = <span style="color: #98be65;">"neural_network.json"</span>
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">def</span> <span style="color: #c678dd;">__init__</span>(<span style="color: #51afef;">self</span>, num_hidden_nodes, data_matrix, data_labels, training_indices, use_file=<span style="color: #a9a1e1;">True</span>):
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.sigmoid = np.vectorize(<span style="color: #51afef;">self</span>._sigmoid_scalar)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.sigmoid_prime = np.vectorize(<span style="color: #51afef;">self</span>._sigmoid_prime_scalar)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.theta = <span style="color: #da8548; font-weight: bold;">0</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">if</span> <span style="color: #51afef;">not</span> os.path.isfile(<span style="color: #51afef;">self</span>.NEURAL_NETWORK_FILE_PATH):
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.theta1 = <span style="color: #51afef;">self</span>._initialize_random_weights(<span style="color: #da8548; font-weight: bold;">400</span>, num_hidden_nodes)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.theta2 = <span style="color: #51afef;">self</span>._initialize_random_weights(num_hidden_nodes, <span style="color: #da8548; font-weight: bold;">10</span>)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.input_layer_bias = np.random.rand(num_hidden_nodes) * <span style="color: #da8548; font-weight: bold;">0.12</span> - <span style="color: #da8548; font-weight: bold;">0.06</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.hidden_layer_bias = np.random.rand(<span style="color: #da8548; font-weight: bold;">10</span>) * <span style="color: #da8548; font-weight: bold;">0.12</span> - <span style="color: #da8548; font-weight: bold;">0.06</span>
+
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">def</span> <span style="color: #c678dd;">_initialize_random_weights</span>(<span style="color: #51afef;">self</span>, size_in, size_out):
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #83898d;">"""</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   </span><span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   Creates a matrix with `size_in` rows and `size_out` columns.</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   </span><span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   Values will be randomized between -0.06 and 0.06.</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   </span><span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   """</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">return</span> np.random.rand(size_in, size_out) * <span style="color: #da8548; font-weight: bold;">0.12</span> - <span style="color: #da8548; font-weight: bold;">0.06</span>
+
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">def</span> <span style="color: #c678dd;">_sigmoid_scalar</span>(<span style="color: #51afef;">self</span>, z):
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #83898d;">"""Activation function."""</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">return</span> <span style="color: #da8548; font-weight: bold;">1</span> / (<span style="color: #da8548; font-weight: bold;">1</span> + math.e ** -z)
+
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">def</span> <span style="color: #c678dd;">_sigmoid_prime_scalar</span>(<span style="color: #51afef;">self</span>, z):
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">return</span> <span style="color: #51afef;">self</span>.sigmoid(z) * (<span style="color: #da8548; font-weight: bold;">1</span> - <span style="color: #51afef;">self</span>.sigmoid(z))
+
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">def</span> <span style="color: #c678dd;">forward_propagate</span>(<span style="color: #51afef;">self</span>, input_vals):
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">input_vals</span> = np.array(input_vals)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">y1</span> = np.dot(input_vals, <span style="color: #51afef;">self</span>.theta1)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">y1</span> = y1 + <span style="color: #51afef;">self</span>.input_layer_bias
+
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">y2</span> = np.dot(y1, <span style="color: #51afef;">self</span>.theta2)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">y2</span> = y2 + <span style="color: #51afef;">self</span>.hidden_layer_bias
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">y2</span> = <span style="color: #51afef;">self</span>.sigmoid(y2)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Returns each layer</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">return</span> [y1, y2]
+
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">def</span> <span style="color: #c678dd;">predict</span>(<span style="color: #51afef;">self</span>, test):
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">output_node_vals</span> = <span style="color: #51afef;">self</span>.forward_propagate(test)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">return</span> output_node_vals
+
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">def</span> <span style="color: #c678dd;">train</span>(<span style="color: #51afef;">self</span>, training_data):
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">for</span> data <span style="color: #51afef;">in</span> training_data:
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">hidden_layer_node_vals</span>, <span style="color: #dcaeea;">output_node_vals</span> = <span style="color: #51afef;">self</span>.forward_propagate(data[<span style="color: #98be65;">"y0"</span>])
+
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Back propagate</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">actual_vals</span> = np.zeros(<span style="color: #da8548; font-weight: bold;">10</span>)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   actual_vals[data[<span style="color: #98be65;">"label"</span>]] = <span style="color: #da8548; font-weight: bold;">1</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">output_errors</span> = actual_vals - output_node_vals
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">hidden_errors</span> = np.multiply(
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.theta2, output_errors,
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.sigmoid_prime(hidden_layer_node_vals)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   )
+
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #5B6268;"># </span><span style="color: #5B6268;">Update weights</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.theta1 += <span style="color: #51afef;">self</span>.LEARNING_RATE * (hidden_errors * data[<span style="color: #98be65;">"y0"</span>])
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.theta2 += <span style="color: #51afef;">self</span>.LEARNING_RATE * (output_errors * hidden_layer_node_vals)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.hidden_layer_bias += <span style="color: #51afef;">self</span>.LEARNING_RATE * output_errors
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.input_layer_bias += <span style="color: #51afef;">self</span>.LEARNING_RATE * hidden_errors
+
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">def</span> <span style="color: #c678dd;">save</span>(<span style="color: #51afef;">self</span>):
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #83898d;">"""</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   </span><span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   We need to work with Numpy "array" types, but the `json` library</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   </span><span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   that we use to serialize/deserialize doesn't know about Numpy types.</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   </span><span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   So, we serialize things as regular python types, like lists, and then</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   </span><span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   deserialize them the same way, and then convert them back to Numpy types.</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   </span><span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   """</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">json_neural_network</span> = {
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #98be65;">"theta1"</span>: <span style="color: #51afef;">self</span>.theta1.tolist(),
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #98be65;">"theta2"</span>: <span style="color: #51afef;">self</span>.theta2.tolist(),
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #98be65;">"bias1"</span>: <span style="color: #51afef;">self</span>.input_layer_bias.tolist(),
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #98be65;">"bias2"</span>: <span style="color: #51afef;">self</span>.hidden_layer_bias.tolist(),
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   }
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">with</span> <span style="color: #c678dd;">open</span>(<span style="color: #51afef;">self</span>.NEURAL_NETWORK_FILE_PATH) <span style="color: #51afef;">as</span> f:
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   json.dump(json_neural_network, f)
+
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">def</span> <span style="color: #c678dd;">load</span>(<span style="color: #51afef;">self</span>):
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #83898d;">"""</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   </span><span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   We need to work with Numpy "array" types, but the `json` library</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   </span><span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   that we use to serialize/deserialize doesn't know about Numpy types.</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   </span><span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   So, we serialize things as regular python types, like lists, and then</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   </span><span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   deserialize them the same way, and then convert them back to Numpy types.</span>
+<span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   </span><span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   """</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">if</span> <span style="color: #51afef;">not</span> os.path.isfile(<span style="color: #51afef;">self</span>.NEURAL_NETWORK_FILE_PATH):
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">return</span>
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">with</span> <span style="color: #c678dd;">open</span>(<span style="color: #51afef;">self</span>.NEURAL_NETWORK_FILE_PATH) <span style="color: #51afef;">as</span> f:
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">neural_network</span> = json.load(f)
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.theta1 = np.array(neural_network[<span style="color: #98be65;">"theta1"</span>])
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.theta2 = np.array(neural_network[<span style="color: #98be65;">"theta2"</span>])
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.input_layer_bias = np.array(neural_network[<span style="color: #98be65;">"bias1"</span>])
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">self</span>.hidden_layer_bias = np.array(neural_network[<span style="color: #98be65;">"bias2"</span>])
 </pre>
 </div>
 </div>
@@ -603,7 +1264,7 @@ For the functionality of clearing the canvas to reset our drawing, we&rsquo;ll s
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Eric Ihli</p>
-<p class="date">Created: 2021-01-19 Tue 13:15</p>
+<p class="date">Created: 2021-02-17 Wed 21:48</p>
 </div>
 </body>
 </html>

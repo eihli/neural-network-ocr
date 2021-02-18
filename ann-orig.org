@@ -50,7 +50,7 @@ So we'll display a 3x3 grid that represents 9 of our pixels, but they will be re
 
 In the end, it will look like this:
 
-TODO: INSERT IFRAME
+#+INCLUDE: "iteration-1/ocr.html" export html
 
 The details of the pixel coloring/scaling will be handled in some Javascript later. For now, let's just create an HTML file to work with.
 
@@ -168,82 +168,9 @@ function drawGrid(ctx) {
 </html>
 #+END_SRC
 
-Let's see what the grid looks like at [[./iteration-1/drawGridExample.html]]
+Let's see what the grid looks like at [[./drawGridExample.html]]
 
-#+begin_export html
-<iframe src="iteration-1/drawGridExample.html"></iframe>
-#+end_export
-
-** Drawing on the grid
-
-Let's write a function that will take a mouse event and a canvas element and will fill a square of the grid.
-
-Mouse events have a ~clientX~ and ~clientY~ property that represent the pixel coordinates of the mouse. Those coordinates are relative to the applications viewport. For example, clicking on the left edge of the viewable area of a page will always result in a mouse event with a ~clientX~ of ~0~, regardless of whether the page is scrolled horizontally.
-
-We also need to know where the canvas element is in relation to the viewport so that we can draw in the correct square of the grid. Elements have a ~getBoundingClientRect()~ function that returns an object that has ~x~ and ~y~ properties denoting the pixel positions of their left-most and top-most edges.
-
-If the left edge of the canvas is ~100~ pixels to the right of the left edge of the viewport, and if a mouse event has a ~clientX~ between ~100~ and ~120~, then we know the mouse is in the first column of squares of the grid.
-
-#+NAME: fillSquare
-#+BEGIN_SRC javascript :noweb yes
-function fillSquare(mouseEvent, context, canvasElement) {
-    let boundingRect = canvasElement.getBoundingClientRect();
-    let x = mouseEvent.clientX - boundingRect.x;
-    let y = mouseEvent.clientY - boundingRect.y;
-    let xPixel = Math.floor(x / PIXEL_WIDTH);
-    let yPixel = Math.floor(y / PIXEL_WIDTH);
-    context.fillStyle = STROKE_COLOR;
-    context.fillRect(
-        xPixel * PIXEL_WIDTH,
-        yPixel * PIXEL_WIDTH,
-        PIXEL_WIDTH,
-        PIXEL_WIDTH
-    );
-    <<save info about which pixels are colored in>>
-}
-#+END_SRC
-
-#+NAME: mouse events
-#+BEGIN_SRC javascript
-function onMouseDown(event, context, canvas) {
-    canvas.isDrawing = true;
-    fillSquare(event, context, canvas);
-}
-
-function onMouseUp(canvas) {
-    canvas.isDrawing = false;
-}
-
-function onMouseMove(event, context, canvas) {
-    if (!canvas.isDrawing) {
-        return;
-    }
-    fillSquare(event, context, canvas);
-}
-#+END_SRC
-
-Let's try it out! See [[./iteration-1/mouseEventsExample.html]]
-
-#+BEGIN_SRC html :tangle iteration-1/mouseEventsExample.html :noweb no-export
-<html>
-  <body>
-    <canvas id="canvas" width="200" height="200"></canvas>
-    <script>
-      <<javascript constants>>
-      <<drawGrid>>
-      let canvasEl = document.getElementById("canvas");
-      let context = canvasEl.getContext("2d");
-      drawGrid(context);
-
-      <<fillSquare>>
-      <<mouse events>>
-      canvasEl.onmousemove = function(event) { onMouseMove(event, context, canvasEl); };
-      canvasEl.onmousedown = function(event) { onMouseDown(event, context, canvasEl); };
-      canvasEl.onmouseup = function(_) { onMouseUp(canvasEl); };
-    </script>
-  </body>
-</html>
-#+END_SRC
+#+INCLUDE: "drawGridExample.html" export html
 
 We also need a variable to store the information regarding which pixels make up the drawn number.
 
@@ -291,13 +218,214 @@ let pixelData = [[0, 0, 0],
                  [0, 0, 0]];
 #+END_SRC
 
-Along with coloring the square in the grid, we also want to store the information that we colored a particular pixel in our pixelData that we'll later send to a server to either train our model or make a prediction.
+#+NAME: input-form-and-buttons
+#+BEGIN_SRC html
+<form name="input">
+  <label for="digit">Digit:</label>
+  <input type="text" id="digit">
+  <input type="button" value="Train" onclick="ocrDemo.train()">
+  <input type="button" value="Predict" onclick="ocrDemo.predict()">
+  <input type="button" value="Reset" onclick="ocrDemo.resetCanvas()">
+</form>
+#+END_SRC
 
-#+NAME: save info about which pixels are colored in
-#+begin_src javascript
-let pixelIndex = yPixel * GRID_WIDTH + xPixel;
-pixelData[pixelIndex] = 1;
-#+end_src
+#+BEGIN_SRC html :tangle ocr.html
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script src="ocr.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="ocr.css" type="text/css" media="screen" />
+    <title>OCR Demo</title>
+  </head>
+  <body onload="ocrDemo.onLoadFunction()">
+    <div id="main-container" style="text-align: center;">
+      <h1>OCR Demo</h1>
+      <canvas id="canvas" width="200" height="200"></canvas>
+      <form name="input">
+        <label for="digit">Digit:</label>
+        <input type="text" id="digit">
+        <input type="button" value="Train" onclick="ocrDemo.train()">
+        <input type="button" value="Predict" onclick="ocrDemo.predict()">
+        <input type="button" value="Reset" onclick="ocrDemo.resetCanvas()">
+      </form>
+    </div>
+  </body>
+</html>
+#+END_SRC
+
+* Javascript
+
+You'll see the stylesheet linked in the HTML is called ~ocr.js~. Let's create that.
+
+In the body tag, we have an ~onload~ handler that calls ~ocrDemo.onLoadFunction()~. That will
+be the start of the ~ocr.js~ file. But we'll finish the details later.
+
+Javascript treats everything defined outside of a function as being in the global namespace. It's a bad habit to pollute the global namespace with things that aren't necessary. So we'll put most of our code inside a function and only put what we absolutely need to in the global namespace.
+
+
+#+NAME: ocr.js
+#+BEGIN_SRC javascript :tangle ocr.js :noweb no-export
+let ocrDemo = (function() {
+    <<javascript constants>>
+    <<drawGrid>>
+    <<fillSquare>>
+    <<mouse events>>
+    <<onLoadFunction>>
+    <<resetCanvas>>
+    <<sendData>>
+    <<train>>
+    <<predict>>
+    return {
+        onLoadFunction,
+        train,
+        predict,
+        resetCanvas
+    };
+})();
+#+END_SRC
+
+** Drawing the grid on canvas
+
+Let's define some constants for coloring the canvas.
+
+#+BEGIN_SRC javascript :noweb-ref "javascript constants"
+const GRID_STROKE_COLOR = "blue";
+const BACKGROUND_COLOR = "black";
+const STROKE_COLOR = "white";
+const CANVAS_WIDTH = 200;
+const GRID_WIDTH = 20;
+// We'll draw on a 20 x 20 grid.
+// CANVAS_WIDTH divided by 20 GRID_WIDTH equals 10 pixels per grid block.
+const SCALED_PIXEL_WIDTH = CANVAS_WIDTH / GRID_WIDTH;
+const HOST = "localhost";
+const PORT = "8888";
+#+END_SRC
+
+We also need a variable to store the information regarding which pixels make up the drawn number.
+
+#+BEGIN_SRC javascript :noweb-ref "javascript constants"
+let pixelData = [];
+#+END_SRC
+
+Any time we draw a fresh grid, we'll want to fill the entire canvas with the background color and then re-draw the lines of the grid.
+
+#+NAME: drawGrid
+#+BEGIN_SRC javascript
+function drawGrid(ctx) {
+    ctx.fillStyle = BACKGROUND_COLOR;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_WIDTH);
+    ctx.strokeStyle = GRID_STROKE_COLOR;
+    for (
+        let x = SCALED_PIXEL_WIDTH, y = SCALED_PIXEL_WIDTH;
+        x < CANVAS_WIDTH;
+        x += SCALED_PIXEL_WIDTH, y += SCALED_PIXEL_WIDTH
+    ) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, CANVAS_WIDTH);
+        ctx.moveTo(0, y);
+        ctx.lineTo(CANVAS_WIDTH, y);
+        ctx.stroke();
+    }
+};
+#+END_SRC
+
+#+NAME: draw grid example
+#+BEGIN_SRC html :tangle drawGridExample.html :noweb no-export
+<html>
+  <body>
+    <canvas id="canvas" width="200" height="200"></canvas>
+    <script>
+      <<javascript constants>>
+      <<drawGrid>>
+      let canvasEl = document.getElementById("canvas");
+      let context = canvasEl.getContext("2d");
+      drawGrid(context);
+    </script>
+  </body>
+</html>
+#+END_SRC
+
+Let's see what the grid looks like at [[./drawGridExample.html]]
+
+#+INCLUDE: "drawGridExample.html" export html
+
+** Drawing on the grid
+
+Let's write a function that will take a mouse event and a canvas element and will fill a square of the grid.
+
+Mouse events have a ~clientX~ and ~clientY~ property that represent the pixel coordinates of the mouse. Those coordinates are relative to the applications viewport. For example, clicking on the left edge of the viewable area of a page will always result in a mouse event with a ~clientX~ of ~0~, regardless of whether the page is scrolled horizontally.
+
+We also need to know where the canvas element is in relation to the viewport so that we can draw in the correct square of the grid. Elements have a ~getBoundingClientRect()~ function that returns an object that has ~x~ and ~y~ properties denoting the pixel positions of their left-most and top-most edges.
+
+If the left edge of the canvas is ~100~ pixels to the right of the left edge of the viewport, and if a mouse event has a ~clientX~ between ~100~ and ~120~, then we know the mouse is in the first column of squares of the grid.
+
+#+NAME: fillSquare
+#+BEGIN_SRC javascript
+function fillSquare(mouseEvent, context, canvasElement) {
+    let boundingRect = canvasElement.getBoundingClientRect();
+    let x = mouseEvent.clientX - boundingRect.x;
+    let y = mouseEvent.clientY - boundingRect.y;
+    let xPixel = Math.floor(x / SCALED_PIXEL_WIDTH);
+    let yPixel = Math.floor(y / SCALED_PIXEL_WIDTH);
+    context.fillStyle = STROKE_COLOR;
+    context.fillRect(
+        xPixel * SCALED_PIXEL_WIDTH,
+        yPixel * SCALED_PIXEL_WIDTH,
+        SCALED_PIXEL_WIDTH,
+        SCALED_PIXEL_WIDTH
+    );
+    // Along with coloring the square in the grid,
+    // we also want to store the information that we colored
+    // a particular pixel in our pixelData that we'll later
+    // send to a server to either train our model or make
+    // a prediction.
+    let pixelIndex = yPixel * GRID_WIDTH + xPixel;
+    pixelData[pixelIndex] = 1;
+}
+#+END_SRC
+
+#+NAME: mouse events
+#+BEGIN_SRC javascript
+function onMouseDown(event, context, canvas) {
+    canvas.isDrawing = true;
+    fillSquare(event, context, canvas);
+}
+
+function onMouseUp(canvas) {
+    canvas.isDrawing = false;
+}
+
+function onMouseMove(event, context, canvas) {
+    if (!canvas.isDrawing) {
+        return;
+    }
+    fillSquare(event, context, canvas);
+}
+#+END_SRC
+
+Let's try it out! See [[./mouseEventsExample.html]]
+
+#+BEGIN_SRC html :tangle mouseEventsExample.html :noweb no-export
+<html>
+  <body>
+    <canvas id="canvas" width="200" height="200"></canvas>
+    <script>
+      <<javascript constants>>
+      <<drawGrid>>
+      let canvasEl = document.getElementById("canvas");
+      let context = canvasEl.getContext("2d");
+      drawGrid(context);
+
+      <<fillSquare>>
+      <<mouse events>>
+      canvasEl.onmousemove = function(event) { onMouseMove(event, context, canvasEl); };
+      canvasEl.onmousedown = function(event) { onMouseDown(event, context, canvasEl); };
+      canvasEl.onmouseup = function(_) { onMouseUp(canvasEl); };
+    </script>
+  </body>
+</html>
+#+END_SRC
 
 Now we have everything we need to complete our ~onLoadFunction~. In it, we'll do all our initial one-time setup: draw the grid and establish mouse events.
 
@@ -320,7 +448,7 @@ For the functionality of clearing the canvas to reset our drawing, we'll simple 
 function resetCanvas() {
     let canvasEl = document.getElementById("canvas");
     let context = canvasEl.getContext("2d");
-    let gridSize = Math.pow((CANVAS_WIDTH / PIXEL_WIDTH), 2);
+    let gridSize = Math.pow((CANVAS_WIDTH / SCALED_PIXEL_WIDTH), 2);
     pixelData = [];
     while (gridSize--) pixelData.push(0);
     console.log(pixelData);

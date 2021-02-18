@@ -45,7 +45,8 @@
               PIXEL_WIDTH,
               PIXEL_WIDTH
           );
-          <<save info about which pixels are colored in>>
+          let pixelIndex = yPixel * GRID_WIDTH + xPixel;
+          pixelData[pixelIndex] = 1;
       }
       function onMouseDown(event, context, canvas) {
           canvas.isDrawing = true;

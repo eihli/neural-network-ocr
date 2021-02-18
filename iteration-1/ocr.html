@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script src="ocr.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="ocr.css" type="text/css" media="screen" />
+    <title>OCR Demo</title>
+  </head>
+  <body onload="ocrDemo.onLoadFunction()">
+    <div id="main-container" style="text-align: center;">
+      <h1>OCR Demo</h1>
+      <canvas id="canvas" width="200" height="200"></canvas>
+      <form name="input">
+        <label for="digit">Digit:</label>
+        <input type="text" id="digit">
+        <input type="button" value="Train" onclick="ocrDemo.train()">
+        <input type="button" value="Predict" onclick="ocrDemo.predict()">
+        <input type="button" value="Reset" onclick="ocrDemo.resetCanvas()">
+      </form>
+    </div>
+  </body>
+</html>
