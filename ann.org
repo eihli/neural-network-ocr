@@ -735,7 +735,7 @@ def _initialize_random_weights(self, size_in, size_out):
 #+END_SRC
 
 
-#+BEGIN_SRC python :noweb yes
+#+BEGIN_SRC python :noweb yes :tangle nn.py
 import csv
 from collections import namedtuple
 import math
@@ -782,6 +782,42 @@ class OCRNeuralNetwork:
     def predict(self, test):
         output_node_vals = self.forward_propagate(test)
         return output_node_vals
+
+    def back_propagate(self, input_data, data_label):
+        # Step 1. Forward propagate, saving the intermediate values
+        # that we'll need for the backprop partial derivative formula later.
+
+        # Save off this pre-activation value. We need it later.
+        hidden_layer_pre_activations = (
+            np.dot(input_data, self.theta1)
+            + self.input_layer_bias
+        )
+        hidden_layer_activations = self.sigmoid(hidden_layer_pre_activations)
+
+        output_layer_pre_activations = (
+            np.dot(self.theta2.T, hidden_layer_activations)
+            + self.hidden_layer_bias
+        )
+        output_layer_activations = self.sigmoid(output_layer_pre_activations)
+
+        # Step 2. Back propagate.
+        target_values = np.zeros(10)
+        target_values[data_label] = 1
+
+        errors = output_layer_activations - target_values
+        # TODO: The multiplications below need to be dot products or elementwise. Think about which.
+        rate_of_change_of_error_with_respect_to_final_weights = (
+            (output_layer_activations - target_values)
+            ,* self.sigmoid_prime(output_layer_pre_activations)
+            ,* hidden_layer_activations
+        )
+        rate_of_change_of_error_with_respect_to_first_weights = (
+            (output_layer_activations - target_values)
+            ,* self.sigmoid_prime(output_layer_pre_activations)
+            ,* self.theta2
+            ,* self.sigmoid_prime(hidden_layer_pre_activations)
+            ,* input_data
+        )
 
     def train(self, training_data):
         for data in training_data:
