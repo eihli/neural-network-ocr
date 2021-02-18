@@ -9,7 +9,7 @@ import matplotlib.cm as cm
 import numpy as np
 
 class OCRNeuralNetwork:
-    LEARNING_RATE = 0.3
+    LEARNING_RATE = 0.05
     NEURAL_NETWORK_FILE_PATH = "neural_network.json"
     def __init__(
             self,
@@ -31,7 +31,7 @@ class OCRNeuralNetwork:
 
     def _initialize_random_weights(self, size_in, size_out):
         """
-        Creates a matrix with `size_in` rows and `size_out` columns.
+        Creates a matrix with `size_out` rows and `size_in` columns.
         Values will be randomized between -0.06 and 0.06.
         """
         return np.random.rand(size_in, size_out) * 0.12 - 0.06
@@ -51,22 +51,20 @@ class OCRNeuralNetwork:
 
     def initialize(self):
         with open("simple_train.csv", "rb") as f:
-            data_matrix = np.loadtxt(f, delimiter=",", skiprows=0)
+            data_matrix = np.loadtxt(f, delimiter=",", skiprows=1)
         data_labels = data_matrix[:1000,0]
         data_matrix = data_matrix[:1000,1:]
         # data_matrix = np.where(data_matrix > 160, 1, 0)
         data_with_labels = list(zip(data_matrix, data_labels))
-        for data, label in data_with_labels:
+        for data, label in random.choices(data_with_labels, k=1000):
             self.back_propagate(data, int(label))
 
     def forward_propagate(self, input_vals):
         input_vals = np.array(input_vals)
         y1 = np.dot(input_vals, self.theta1)
-        y1 += self.input_layer_bias
         y1 = self.sigmoid(y1)
 
         y2 = np.dot(y1, self.theta2)
-        y2 += self.hidden_layer_bias
         y2 = self.sigmoid(y2)
         return y2
 
@@ -140,7 +138,6 @@ class OCRNeuralNetwork:
             * rate_of_change_of_error_with_respect_to_first_weights
         )
         self.input_layer_bias -= errors_of_hidden_layer * self.LEARNING_RATE
-
 
     def train(self, training_data):
         for data in training_data:
