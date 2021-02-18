@@ -7,9 +7,11 @@ import nn
 
 HOST_NAME = "localhost"
 PORT_NUMBER = 8888
-HIDDEN_NODE_COUNT = 20
+INPUT_NODE_COUNT = 9
+HIDDEN_NODE_COUNT = 4
+OUTPUT_NODE_COUNT = 2
 
-neural_network = nn.OCRNeuralNetwork(784, 20, 10)
+neural_network = nn.OCRNeuralNetwork(INPUT_NODE_COUNT, HIDDEN_NODE_COUNT, OUTPUT_NODE_COUNT)
 
 
 class JSONHandler(http.server.SimpleHTTPRequestHandler):

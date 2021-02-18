@@ -9,7 +9,7 @@ import matplotlib.cm as cm
 import numpy as np
 
 class OCRNeuralNetwork:
-    LEARNING_RATE = 0.1
+    LEARNING_RATE = 0.3
     NEURAL_NETWORK_FILE_PATH = "neural_network.json"
     def __init__(
             self,
@@ -26,8 +26,8 @@ class OCRNeuralNetwork:
         if not os.path.isfile(self.NEURAL_NETWORK_FILE_PATH):
             self.theta1 = self._initialize_random_weights(num_input_nodes, num_hidden_nodes)
             self.theta2 = self._initialize_random_weights(num_hidden_nodes, num_output_nodes)
-            self.input_layer_bias = np.random.rand(num_hidden_nodes) * 0.012 - 0.006
-            self.hidden_layer_bias = np.random.rand(num_output_nodes) * 0.012 - 0.006
+            self.input_layer_bias = np.random.rand(num_hidden_nodes) * 0.12 - 0.06
+            self.hidden_layer_bias = np.random.rand(num_output_nodes) * 0.12 - 0.06
 
     def _initialize_random_weights(self, size_in, size_out):
         """
@@ -37,35 +37,36 @@ class OCRNeuralNetwork:
         return np.random.rand(size_in, size_out) * 0.12 - 0.06
 
     def sigmoid(self, z):
-        return self.__sigmoid(np.clip(z, 100, 100))
+        return self.__sigmoid(np.clip(z, -100, 100))
 
     def _sigmoid_scalar(self, z):
         """Activation function."""
         return 1 / (1 + math.e ** -z)
 
     def sigmoid_prime(self, z):
-        return self.__sigmoid_prime(np.clip(z, 100, 100))
+        return self.__sigmoid_prime(np.clip(z, -100, 100))
 
     def _sigmoid_prime_scalar(self, z):
         return self.sigmoid(z) * (1 - self.sigmoid(z))
 
     def initialize(self):
-        with open("mnist_train.csv", "rb") as f:
-            data_matrix = np.loadtxt(f, delimiter=",", skiprows=1)
+        with open("simple_train.csv", "rb") as f:
+            data_matrix = np.loadtxt(f, delimiter=",", skiprows=0)
         data_labels = data_matrix[:1000,0]
         data_matrix = data_matrix[:1000,1:]
-        data_matrix = np.where(data_matrix > 160, 1, 0)
+        # data_matrix = np.where(data_matrix > 160, 1, 0)
         data_with_labels = list(zip(data_matrix, data_labels))
-        random.shuffle(data_with_labels)
         for data, label in data_with_labels:
             self.back_propagate(data, int(label))
 
     def forward_propagate(self, input_vals):
         input_vals = np.array(input_vals)
         y1 = np.dot(input_vals, self.theta1)
+        y1 += self.input_layer_bias
         y1 = self.sigmoid(y1)
 
         y2 = np.dot(y1, self.theta2)
+        y2 += self.hidden_layer_bias
         y2 = self.sigmoid(y2)
         return y2
 
@@ -80,11 +81,13 @@ class OCRNeuralNetwork:
         # Save off this pre-activation value. We need it later.
         hidden_layer_pre_activations = (
             np.dot(input_data, self.theta1)
+            + self.input_layer_bias
         )
         hidden_layer_activations = self.sigmoid(hidden_layer_pre_activations)
 
         output_layer_pre_activations = (
             np.dot(hidden_layer_activations, self.theta2)
+            + self.hidden_layer_bias
         )
         output_layer_activations = self.sigmoid(output_layer_pre_activations)
         self.output_layer_activations = output_layer_activations
@@ -95,7 +98,7 @@ class OCRNeuralNetwork:
 
 
         # 1 x num_output_nodes
-        errors_of_output_layer = target_values - output_layer_activations
+        errors_of_output_layer = output_layer_activations - target_values
         self.errors = errors_of_output_layer
 
         # num_output_nodes x num_hidden_nodes
@@ -103,7 +106,7 @@ class OCRNeuralNetwork:
         rate_of_change_of_error_with_respect_to_final_weights = np.dot(
             (
                 errors_of_output_layer
-                * self.sigmoid_prime(output_layer_activations)
+                * self.sigmoid_prime(output_layer_pre_activations)
             ).reshape(-1, 1),
             hidden_layer_activations.reshape(1, -1)
         ).T
@@ -114,7 +117,7 @@ class OCRNeuralNetwork:
         # 1 x num_hidden_nodes
         errors_of_hidden_layer = np.dot(
             errors_of_output_layer
-            * self.sigmoid_prime(output_layer_activations),
+            * self.sigmoid_prime(output_layer_pre_activations),
             self.theta2.T
         )
         # num_hidden_nodes x num_input_nodes
@@ -122,19 +125,21 @@ class OCRNeuralNetwork:
         rate_of_change_of_error_with_respect_to_first_weights = (
             (
                 errors_of_hidden_layer  # 1 x num_hidden_nodes
-                * self.sigmoid_prime(hidden_layer_activations)  # 1 x num_hidden_nodes
+                * self.sigmoid_prime(hidden_layer_pre_activations)  # 1 x num_hidden_nodes
             ).reshape(-1, 1)  # num_hidden_nodes x 1
             * input_data.reshape(1, -1)  # 1 x num_input_nodes
         ).T
 
-        self.theta2 += (
+        self.theta2 -= (
             self.LEARNING_RATE
             * rate_of_change_of_error_with_respect_to_final_weights
         )
-        self.theta1 += (
+        self.hidden_layer_bias -= errors_of_output_layer * self.LEARNING_RATE
+        self.theta1 -= (
             self.LEARNING_RATE
             * rate_of_change_of_error_with_respect_to_first_weights
         )
+        self.input_layer_bias -= errors_of_hidden_layer * self.LEARNING_RATE
 
 
     def train(self, training_data):

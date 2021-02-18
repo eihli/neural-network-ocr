@@ -124,8 +124,8 @@ Let's define some constants for coloring the canvas.
 const GRID_STROKE_COLOR = "blue";
 const BACKGROUND_COLOR = "black";
 const STROKE_COLOR = "white";
-const PIXEL_WIDTH = 8
-const GRID_WIDTH = 28;
+const PIXEL_WIDTH = 50;
+const GRID_WIDTH = 3;
 const CANVAS_WIDTH = PIXEL_WIDTH * GRID_WIDTH;
 const HOST = "localhost";
 const PORT = "8888";
@@ -406,9 +406,11 @@ import nn
 
 HOST_NAME = "localhost"
 PORT_NUMBER = 8888
-HIDDEN_NODE_COUNT = 20
+INPUT_NODE_COUNT = 9
+HIDDEN_NODE_COUNT = 4
+OUTPUT_NODE_COUNT = 2
 
-neural_network = nn.OCRNeuralNetwork(784, 20, 10)
+neural_network = nn.OCRNeuralNetwork(INPUT_NODE_COUNT, HIDDEN_NODE_COUNT, OUTPUT_NODE_COUNT)
 
 
 class JSONHandler(http.server.SimpleHTTPRequestHandler):
@@ -740,7 +742,7 @@ So ~x~ in the generator below will be a numpy array that looks like ~[0.13328, 0
 #+BEGIN_SRC python
 def _initialize_random_weights(self, size_in, size_out):
     """
-    Creates a matrix with `size_in` rows and `size_out` columns.
+    Creates a matrix with `size_out` rows and `size_in` columns.
     Values will be randomized between -0.06 and 0.06.
     """
     return np.random.rand(size_in, size_out) * 0.12 - 0.06
@@ -782,24 +784,24 @@ class OCRNeuralNetwork:
     <<define initialize random weights>>
 
     def sigmoid(self, z):
-        return self.__sigmoid(np.clip(z, 100, 100))
+        return self.__sigmoid(np.clip(z, -100, 100))
 
     def _sigmoid_scalar(self, z):
         """Activation function."""
         return 1 / (1 + math.e ** -z)
 
     def sigmoid_prime(self, z):
-        return self.__sigmoid_prime(np.clip(z, 100, 100))
+        return self.__sigmoid_prime(np.clip(z, -100, 100))
 
     def _sigmoid_prime_scalar(self, z):
         return self.sigmoid(z) * (1 - self.sigmoid(z))
 
     def initialize(self):
-        with open("mnist_train.csv", "rb") as f:
+        with open("simple_train.csv", "rb") as f:
             data_matrix = np.loadtxt(f, delimiter=",", skiprows=1)
         data_labels = data_matrix[:1000,0]
         data_matrix = data_matrix[:1000,1:]
-        data_matrix = np.where(data_matrix > 160, 1, 0)
+        # data_matrix = np.where(data_matrix > 160, 1, 0)
         data_with_labels = list(zip(data_matrix, data_labels))
         random.shuffle(data_with_labels)
         for data, label in data_with_labels:
