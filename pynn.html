@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2021-02-19 Fri 08:41 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Python Neural Network From Scratch</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Eric Ihli" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Python Neural Network From Scratch</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgc93ea64">1. Weights</a>
+<ul>
+<li><a href="#orgde285e0">1.1. On a scale of 0 to 50, how important to you is machine learning?</a></li>
+<li><a href="#org0ff03dd">1.2. What about exercise? How much downwards would you adjust machine learning&rsquo;s importance to account for not just eating and sleeping, but also for exercise?</a></li>
+<li><a href="#orgf8dc619">1.3. Great. What if someone else uses a different scale and you want to compare your numbers with them. What if their scale is 0 to 100? If you said &ldquo;Exercise is 5 points of importance&rdquo;, would you be accurately conveying to them how important exercise is to you?</a></li>
+<li><a href="#org640ed58">1.4. Maybe we should use percentages instead?</a></li>
+<li><a href="#org09458d7">1.5. How could eating, sleeping, exercsing, and machine learning be evenly divided into the 24 hours of a day?</a></li>
+<li><a href="#orgcda6886">1.6. How many hours more do you dedicate to machine learning than the average person?</a></li>
+<li><a href="#org375a4b8">1.7. What could you multiply the average person&rsquo;s time spent on machine learning to arrive at the amount of time you spend on machine learning?</a></li>
+<li><a href="#orgc1dead8">1.8. Could you do the same thing for the other categories of activities?</a></li>
+<li><a href="#orgfdcd350">1.9. Instead of using [3h, 6h, 3h, 12h] to identify your preferences, could we use your percentages in relation to the baseline of [6h, 6h, 6h, 6h]?</a></li>
+<li><a href="#orgb9c8ae6">1.10. If 6 * 1/2 = 3, does 3 * 2/1 = 6?</a></li>
+<li><a href="#org4d7e821">1.11. If 6 * 2/1 = 12, does 12 * 1/2 = 6?</a></li>
+<li><a href="#orgce1d8aa">1.12. If a * b/c = d, does d * c/b = a?</a></li>
+<li><a href="#orgc377e79">1.13. Great. So if we know your hourly preferences ([3h, 6h, 3h, 12h]), and we know your percentage preferences ([1/2, 1/1, 1/2, 2/1]), can we perform that type of calculation to arrive at the average preference of [6h, 6h, 6h, 6h]?</a></li>
+<li><a href="#org9050654">1.14. What if we didn&rsquo;t know that the average person&rsquo;s preferences were [6h, 6h, 6h, 6h] but we did know that your preferences were [3h, 6h, 3h, 12h] and the percentages of your preferences in relation to the baseline were [1/2, 1/1, 1/2, 2/1], could we figure out the average person&rsquo;s preferences?</a></li>
+<li><a href="#org6a9bd3e">1.15. Let&rsquo;s say you knew someone&rsquo;s preferences were [4h, 6h, 4h, 10h] (they appreciate food and exercise a little more than you, at the expense of their interest in machine learning). What would you get if you multiplied their hourly preferences by your percentage preferences?</a></li>
+<li><a href="#org0fc48b6">1.16. How many total hours would that be?</a></li>
+<li><a href="#orgaab774c">1.17. Given some unknown hourly prefences ([4h, 2h, 4h, 6h], [6h, 6h, ]</a></li>
+</ul>
+</li>
+<li><a href="#org66698da">2. Neural Network</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgc93ea64" class="outline-2">
+<h2 id="orgc93ea64"><span class="section-number-2">1</span> Weights</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-orgde285e0" class="outline-3">
+<h3 id="orgde285e0"><span class="section-number-3">1.1</span> On a scale of 0 to 50, how important to you is machine learning?</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+40&#x2026; I still have to eat and sleep.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org0ff03dd" class="outline-3">
+<h3 id="org0ff03dd"><span class="section-number-3">1.2</span> What about exercise? How much downwards would you adjust machine learning&rsquo;s importance to account for not just eating and sleeping, but also for exercise?</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+Good point. Maybe I&rsquo;d adjust it down 5 points to 35.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf8dc619" class="outline-3">
+<h3 id="orgf8dc619"><span class="section-number-3">1.3</span> Great. What if someone else uses a different scale and you want to compare your numbers with them. What if their scale is 0 to 100? If you said &ldquo;Exercise is 5 points of importance&rdquo;, would you be accurately conveying to them how important exercise is to you?</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+No. 5 points for me on my 0 to 50 scale is not the same as 5 points to someone on a 0 to 100 scale.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org640ed58" class="outline-3">
+<h3 id="org640ed58"><span class="section-number-3">1.4</span> Maybe we should use percentages instead?</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+Yeah. If I said exercise is 10% importance, then everyone will know how important it is to me regardless of what scale they are using.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org09458d7" class="outline-3">
+<h3 id="org09458d7"><span class="section-number-3">1.5</span> How could eating, sleeping, exercsing, and machine learning be evenly divided into the 24 hours of a day?</h3>
+<div class="outline-text-3" id="text-1-5">
+<pre class="example" id="orgde753e4">
+        [                    24 hours                     ]
+
+        [eating,  sleeping,  exercising,  machine learning]
+
+Average [    6h,        6h,          6h,                6h]
+You     [    3h,        6h,          3h,               12h]
+
+        [                 % of 24 hours                   ]
+Average [   25%,       25%,         25%,               25%]
+You     [ 12.5%,       25%,       12.5%,               50%]
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgcda6886" class="outline-3">
+<h3 id="orgcda6886"><span class="section-number-3">1.6</span> How many hours more do you dedicate to machine learning than the average person?</h3>
+<div class="outline-text-3" id="text-1-6">
+<p>
+6 hours more.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org375a4b8" class="outline-3">
+<h3 id="org375a4b8"><span class="section-number-3">1.7</span> What could you multiply the average person&rsquo;s time spent on machine learning to arrive at the amount of time you spend on machine learning?</h3>
+<div class="outline-text-3" id="text-1-7">
+<p>
+Well, the average person spends 8 hours and I spend 16, so I could multiply the average by 2 to get to my number.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc1dead8" class="outline-3">
+<h3 id="orgc1dead8"><span class="section-number-3">1.8</span> Could you do the same thing for the other categories of activities?</h3>
+<div class="outline-text-3" id="text-1-8">
+<p>
+Of course. I spend 1/2th (6 / 2) the average time eating, 1/1th the average time sleeping, 1/2 the average time exercising, and 2/1 the average time machine learning.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgfdcd350" class="outline-3">
+<h3 id="orgfdcd350"><span class="section-number-3">1.9</span> Instead of using [3h, 6h, 3h, 12h] to identify your preferences, could we use your percentages in relation to the baseline of [6h, 6h, 6h, 6h]?</h3>
+<div class="outline-text-3" id="text-1-9">
+<p>
+Sure. That would just be [1/2, 1/1, 1/2, 2/1]. With that list of percentages and with the baseline list of [6h, 6h, 6h, 6h], it&rsquo;s a simple matter of multiplication to end up back at my preferences of [3h, 6h, 3h, 12h].
+</p>
+
+<pre class="example" id="org606b96f">
+  [ 6h		 6h		 6h		 6h]
+* [1/2		1/1		1/2		2/1]
+
+= [ 3h		 6h		 3h		12h]
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgb9c8ae6" class="outline-3">
+<h3 id="orgb9c8ae6"><span class="section-number-3">1.10</span> If 6 * 1/2 = 3, does 3 * 2/1 = 6?</h3>
+<div class="outline-text-3" id="text-1-10">
+<p>
+Of course.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org4d7e821" class="outline-3">
+<h3 id="org4d7e821"><span class="section-number-3">1.11</span> If 6 * 2/1 = 12, does 12 * 1/2 = 6?</h3>
+<div class="outline-text-3" id="text-1-11">
+<p>
+Yes&#x2026; get on with it already&#x2026;
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgce1d8aa" class="outline-3">
+<h3 id="orgce1d8aa"><span class="section-number-3">1.12</span> If a * b/c = d, does d * c/b = a?</h3>
+<div class="outline-text-3" id="text-1-12">
+<p>
+That&rsquo;s a little abstract. But yeah, I think that makes sense.
+</p>
+
+<p>
+I think I&rsquo;ve actually seen that as if <code>a * b = c</code> then <code>a = c/b</code>.  And not to get too fancy with math terms, but division is the same thing as multiplying by the inverse, right? So <code>c / b</code> is the same thing as <code>c * 1/b</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc377e79" class="outline-3">
+<h3 id="orgc377e79"><span class="section-number-3">1.13</span> Great. So if we know your hourly preferences ([3h, 6h, 3h, 12h]), and we know your percentage preferences ([1/2, 1/1, 1/2, 2/1]), can we perform that type of calculation to arrive at the average preference of [6h, 6h, 6h, 6h]?</h3>
+<div class="outline-text-3" id="text-1-13">
+<p>
+Yeah. If my hourly preference for eating is 3h and I know that is 1/2 of the average, then I know the average is 2/1 of my preference. 2/1 * 3h is 6h. We can do that for every category.
+</p>
+
+<pre class="example" id="orgadaa166">
+  [ 3h		 6h		 3h		12h]
+* [2/1		1/1		2/1		1/2]
+
+= [ 6h		 6h		 6h		 6h]
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org9050654" class="outline-3">
+<h3 id="org9050654"><span class="section-number-3">1.14</span> What if we didn&rsquo;t know that the average person&rsquo;s preferences were [6h, 6h, 6h, 6h] but we did know that your preferences were [3h, 6h, 3h, 12h] and the percentages of your preferences in relation to the baseline were [1/2, 1/1, 1/2, 2/1], could we figure out the average person&rsquo;s preferences?</h3>
+<div class="outline-text-3" id="text-1-14">
+<p>
+I think so. Yeah. If my preference for a particular category is 1/2 the average person&rsquo;s, then the average person&rsquo;s is 2 times mine. If mine is 3h for a particular category, then the average person&rsquo;s is 6h. We could do that for every category.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org6a9bd3e" class="outline-3">
+<h3 id="org6a9bd3e"><span class="section-number-3">1.15</span> Let&rsquo;s say you knew someone&rsquo;s preferences were [4h, 6h, 4h, 10h] (they appreciate food and exercise a little more than you, at the expense of their interest in machine learning). What would you get if you multiplied their hourly preferences by your percentage preferences?</h3>
+<div class="outline-text-3" id="text-1-15">
+<pre class="example" id="org3e1c46e">
+Their hourly preferences are    [ 4h,     6h,    4h,  10h]
+My percentage preferences are   [1/2,    1/1,   1/2,  2/1]
+
+So that would be...             [ 2h,     6h,    2h,  20h]
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org0fc48b6" class="outline-3">
+<h3 id="org0fc48b6"><span class="section-number-3">1.16</span> How many total hours would that be?</h3>
+<div class="outline-text-3" id="text-1-16">
+<p>
+Well&#x2026; 1h + 0.5h + 1h + 12h = 14.5 hours.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgaab774c" class="outline-3">
+<h3 id="orgaab774c"><span class="section-number-3">1.17</span> Given some unknown hourly prefences ([4h, 2h, 4h, 6h], [6h, 6h, ]</h3>
+</div>
+</div>
+
+<div id="outline-container-org66698da" class="outline-2">
+<h2 id="org66698da"><span class="section-number-2">2</span> Neural Network</h2>
+<div class="outline-text-2" id="text-2">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #dcaeea;">false_and_false_input</span> = [<span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">0</span>]
+<span style="color: #dcaeea;">true_and_false_input</span>  = [<span style="color: #da8548; font-weight: bold;">1</span>, <span style="color: #da8548; font-weight: bold;">0</span>]
+<span style="color: #dcaeea;">false_and_true_input</span>  = [<span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">1</span>]
+<span style="color: #dcaeea;">true_and_true_input</span>   = [<span style="color: #da8548; font-weight: bold;">1</span>, <span style="color: #da8548; font-weight: bold;">1</span>]
+
+<span style="color: #dcaeea;">false_and_false_target_output</span> = <span style="color: #da8548; font-weight: bold;">0</span>
+<span style="color: #dcaeea;">true_and_false_target_output</span>  = <span style="color: #da8548; font-weight: bold;">0</span>
+<span style="color: #dcaeea;">false_and_true_target_output</span>  = <span style="color: #da8548; font-weight: bold;">0</span>
+<span style="color: #dcaeea;">true_and_true_target_output</span>   = <span style="color: #da8548; font-weight: bold;">1</span>
+
+<span style="color: #dcaeea;">weighted_importance_of_first_input_node</span>  = <span style="color: #da8548; font-weight: bold;">0.0</span>
+<span style="color: #dcaeea;">weighted_importance_of_second_input_node</span> = <span style="color: #da8548; font-weight: bold;">0.0</span>
+<span style="color: #dcaeea;">weights</span> = [
+<span style="background-color: #282c34;"> </span>   weighted_importance_of_first_input_node,
+<span style="background-color: #282c34;"> </span>   weighted_importance_of_second_input_node,
+]
+
+<span style="color: #51afef;">def</span> <span style="color: #c678dd;">multiply_input_nodes_by_weight_nodes</span>(input_nodes, weight_nodes):
+<span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">running_total</span> = <span style="color: #da8548; font-weight: bold;">0</span>
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">for</span> i <span style="color: #51afef;">in</span> <span style="color: #c678dd;">range</span>(<span style="color: #c678dd;">len</span>(input_nodes)):
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   <span style="color: #dcaeea;">running_total</span> += input_nodes[i] * weight_nodes[i]
+<span style="background-color: #282c34;"> </span>   <span style="color: #51afef;">return</span> running_total
+
+<span style="color: #dcaeea;">all_inputs</span> = [
+<span style="background-color: #282c34;"> </span>   false_and_false_input,
+<span style="background-color: #282c34;"> </span>   false_and_true_input,
+<span style="background-color: #282c34;"> </span>   true_and_false_input,
+<span style="background-color: #282c34;"> </span>   true_and_true_input,
+]
+
+<span style="color: #dcaeea;">all_target_outputs</span> = [
+<span style="background-color: #282c34;"> </span>   false_and_false_target_output,
+<span style="background-color: #282c34;"> </span>   true_and_false_target_output,
+<span style="background-color: #282c34;"> </span>   false_and_true_target_output,
+<span style="background-color: #282c34;"> </span>   true_and_true_target_output,
+]
+
+<span style="color: #dcaeea;">results_of_multiplying_inputs_by_weights</span> = []
+<span style="color: #51afef;">for</span> input_nodes <span style="color: #51afef;">in</span> all_inputs:
+<span style="background-color: #282c34;"> </span>   results_of_multiplying_inputs_by_weights.append(
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   multiply_input_nodes_by_weight_nodes(input_nodes, weights)
+<span style="background-color: #282c34;"> </span>   )
+
+<span style="color: #dcaeea;">difference_between_calculated_results_and_target_results</span> = []
+<span style="color: #51afef;">for</span> i <span style="color: #51afef;">in</span> <span style="color: #c678dd;">range</span>(<span style="color: #c678dd;">len</span>(results_of_multiplying_inputs_by_weights)):
+<span style="background-color: #282c34;"> </span>   difference_between_calculated_results_and_target_results.append(
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   all_target_outputs[i]
+<span style="background-color: #282c34;"> </span>   <span style="background-color: #282c34;"> </span>   - results_of_multiplying_inputs_by_weights[i]
+<span style="background-color: #282c34;"> </span>   )
+
+<span style="color: #51afef;">print</span>(difference_between_calculated_results_and_target_results)
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Eric Ihli</p>
+<p class="date">Created: 2021-02-19 Fri 08:41</p>
+</div>
+</body>
+</html>
