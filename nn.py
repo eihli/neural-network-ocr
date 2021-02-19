@@ -8,26 +8,39 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
 
+def initialize_mnist(neural_network, training_count=1000):
+    with open("mnist_train.csv", "rb") as f:
+        data_matrix = np.loadtxt(f, delimiter=",", skiprows=1)
+    data_labels = data_matrix[:,0].astype(int)
+    data_values = data_matrix[:,1:]
+    data_values = np.where(data_values > 180, 1, 0)
+    pool = list(zip(data_values, data_labels))
+    random.shuffle(pool)
+    for value, label in pool[:training_count]:
+        neural_network.back_propagate(value, label)
+
 class OCRNeuralNetwork:
-    LEARNING_RATE = 0.05
+    LEARNING_RATE = 0.2
     NEURAL_NETWORK_FILE_PATH = "neural_network.json"
     def __init__(
             self,
             num_input_nodes,
             num_hidden_nodes,
             num_output_nodes,
-            use_file=True
+            load_from_file=None
     ):
         self.num_input_nodes = num_input_nodes
         self.num_hidden_nodes = num_hidden_nodes
         self.num_output_nodes = num_output_nodes
         self.__sigmoid = np.vectorize(self._sigmoid_scalar)
         self.__sigmoid_prime = np.vectorize(self._sigmoid_prime_scalar)
-        if not os.path.isfile(self.NEURAL_NETWORK_FILE_PATH):
+        if load_from_file is None:
             self.theta1 = self._initialize_random_weights(num_input_nodes, num_hidden_nodes)
             self.theta2 = self._initialize_random_weights(num_hidden_nodes, num_output_nodes)
             self.input_layer_bias = np.random.rand(num_hidden_nodes) * 0.12 - 0.06
             self.hidden_layer_bias = np.random.rand(num_output_nodes) * 0.12 - 0.06
+        else:
+            self.load(load_from_file)
 
     def _initialize_random_weights(self, size_in, size_out):
         """
@@ -62,9 +75,11 @@ class OCRNeuralNetwork:
     def forward_propagate(self, input_vals):
         input_vals = np.array(input_vals)
         y1 = np.dot(input_vals, self.theta1)
+        y1 += self.input_layer_bias
         y1 = self.sigmoid(y1)
 
         y2 = np.dot(y1, self.theta2)
+        y2 += self.hidden_layer_bias
         y2 = self.sigmoid(y2)
         return y2
 
@@ -118,6 +133,7 @@ class OCRNeuralNetwork:
             * self.sigmoid_prime(output_layer_pre_activations),
             self.theta2.T
         )
+        self.errors_of_hidden_layer = errors_of_hidden_layer
         # num_hidden_nodes x num_input_nodes
         # same dimensions as weights
         rate_of_change_of_error_with_respect_to_first_weights = (
@@ -139,26 +155,7 @@ class OCRNeuralNetwork:
         )
         self.input_layer_bias -= errors_of_hidden_layer * self.LEARNING_RATE
 
-    def train(self, training_data):
-        for data in training_data:
-            output_node_vals = self.forward_propagate(data["y0"])
-
-            # Back propagate
-            actual_vals = np.zeros(10)
-            actual_vals[data["label"]] = 1
-            output_errors = actual_vals - output_node_vals
-            hidden_errors = np.multiply(
-                self.theta2, output_errors,
-                self.sigmoid_prime(hidden_layer_node_vals)
-            )
-
-            # Update weights
-            self.theta1 += self.LEARNING_RATE * (hidden_errors * data["y0"])
-            self.theta2 += self.LEARNING_RATE * (output_errors * hidden_layer_node_vals)
-            self.hidden_layer_bias += self.LEARNING_RATE * output_errors
-            self.input_layer_bias += self.LEARNING_RATE * hidden_errors
-
-    def save(self):
+    def save(self, filepath=None):
         """
         We need to work with Numpy "array" types, but the `json` library
         that we use to serialize/deserialize doesn't know about Numpy types.
@@ -171,19 +168,20 @@ class OCRNeuralNetwork:
             "bias1": self.input_layer_bias.tolist(),
             "bias2": self.hidden_layer_bias.tolist(),
         }
-        with open(self.NEURAL_NETWORK_FILE_PATH) as f:
+        filepath = filepath or self.NEURAL_NETWORK_FILE_PATH
+        with open(filepath, "w") as f:
             json.dump(json_neural_network, f)
 
-    def load(self):
+    def load(self, filepath):
         """
         We need to work with Numpy "array" types, but the `json` library
         that we use to serialize/deserialize doesn't know about Numpy types.
         So, we serialize things as regular python types, like lists, and then
         deserialize them the same way, and then convert them back to Numpy types.
         """
-        if not os.path.isfile(self.NEURAL_NETWORK_FILE_PATH):
+        if not os.path.isfile(filepath):
             return
-        with open(self.NEURAL_NETWORK_FILE_PATH) as f:
+        with open(filepath) as f:
             neural_network = json.load(f)
         self.theta1 = np.array(neural_network["theta1"])
         self.theta2 = np.array(neural_network["theta2"])
