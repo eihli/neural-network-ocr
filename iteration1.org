@@ -1,0 +1,454 @@
+#+TITLE: A Simple And Intuitive Intro To Neural Networks (Python, HTML, Javascript)
+
+#+begin_export html
+<script type="text/javascript">
+  function adjustIframes() {
+    let frames = document.getElementsByTagName("iframe");
+
+    for (let frame of frames) {
+      frame.onload = function() {
+        frame.style.height = frame.contentWindow.document.body.scrollHeight + 'px';
+        frame.style.width = frame.contentWindow.document.body.scrollWidth+'px';
+      }
+    }
+  }
+  document.addEventListener("DOMContentLoaded", (event) => {
+    adjustIframes();
+  })
+</script>
+#+end_export
+
+* A Simple And Intuitive Intro To Neural Networks (Python, HTML, Javascript)
+
+You can create a webpage in HTML and Javascript that will let you draw a number, and you can write the server software and a neural network to tell you what number you drew.
+
+I won't use words like "differentiable".
+
+
+I'll take you through all of the steps, thought, and code in order to have a webpage where you can draw a digit between 0 and 9 and have a neural network tell you what digit you drew.
+
+I won't use words like "derivative" or "differentiable" or "gradient".
+
+This will be built from the ground, intuitively.
+
+We'll start by creating an HTML page with a canvas that we can draw on.
+
+Feel free to jump straight to the machine learning secion if you're more interested in that.
+
+* Iteration 1
+** HTML
+
+We need something to draw on.
+
+We are going to start with the simplest "canvas" that can represent a drawn "0" and "1" in any meaningful way.
+
+It will be canvas of 3 pixels wide by 3 pixels high.
+
+#+begin_example
+000
+000
+000
+#+end_example
+
+As we "draw" on this canvas, our "pencil" (mouse pointer) will turn the pixels from 0 to 1.
+
+An ideal zero in this 3x3 grid will look like this:
+
+#+begin_example
+111
+101
+111
+#+end_example
+
+And an ideal one will look like this:
+
+#+begin_example
+010
+010
+010
+#+end_example
+
+We'll also want to train our neural network to recognize imperfect ones and zeros, like this:
+
+#+begin_example
+100
+010
+010
+#+end_example
+
+By starting with such a small and simple canvas, it will be easier to see what's going on inside the neural network. Once we have confidence in our understanding, it will be a small matter to increase the size of our neural network.
+
+Now, when it comes to presenting this canvas on a webpage for users to draw on, the pixels can't literally be single pixels. That will be too small for anyone to see, much less draw on.
+
+We can take a chunk of pixels on screen, a 50x50 square of pixels for example, and treat that entire chunk as a single pixel.
+
+So the frontend will show a 150x150 pixel canvas. But it will be represented in our code for matters computational as a 3x3 pixel grid of ~1~s and ~0~s.
+
+Knowing the best format to display something on the frontend, the best format to store something on the backend, and the best way to translate between the two is a valuable skill. Keep it in mind throughout your work.
+
+In the end, it will look like this:
+
+#+begin_export html
+<iframe src="iteration1/grid-demo.html"></iframe>
+#+end_export
+
+The details of the pixel coloring/scaling will be handled in some Javascript later. For now, let's just create an HTML file to work with.
+
+We'll need:
+
+- Canvas on which to draw numbers
+- Buttons to:
+  - reset the canvas
+  - add the drawing and its labeled digit to the training data
+  - predict what number the drawing represents
+
+#+begin_src html :tangle iteration1/grid-demo.html :mkdirp yes :noweb yes
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script src="ocr.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="ocr.css" type="text/css" media="screen" />
+    <title>Grid Demo</title>
+  </head>
+  <body onload="ocrDemo.onLoadFunction()">
+    <div id="main-container" style="text-align: center;">
+      <canvas id="canvas" width="150" height="150"></canvas>
+      <br>
+      <button type="button" onclick="ocrDemo.resetCanvas()">Reset</button>
+    </div>
+  </body>
+</html>
+#+end_src
+
+** Javascript
+
+You'll see the stylesheet linked in the HTML is called ~ocr.js~. Let's create that.
+
+In the body tag, we have an ~onload~ handler that calls ~ocrDemo.onLoadFunction()~. That will
+be the start of the ~ocr.js~ file. But we'll finish the details later.
+
+Javascript treats everything defined outside of a function as being in the global namespace. It's a bad habit to pollute the global namespace with things that aren't necessary. So we'll put most of our code inside a function and only put what we absolutely need to in the global namespace.
+
+#+NAME: ocr.js
+#+BEGIN_SRC javascript :tangle iteration1/ocr.js :noweb no-export
+let ocrDemo = (function() {
+    <<javascript constants>>
+    <<drawGrid>>
+    <<fillSquare>>
+    <<mouse events>>
+    <<onLoadFunction>>
+    <<resetCanvas>>
+    <<sendData>>
+    <<train>>
+    <<predict>>
+    return {
+        onLoadFunction,
+        train,
+        predict,
+        resetCanvas
+    };
+})();
+#+END_SRC
+
+*** Drawing the grid on canvas
+
+Let's define some constants for coloring the canvas.
+
+#+BEGIN_SRC javascript :noweb-ref "javascript constants"
+const GRID_STROKE_COLOR = "blue";
+const BACKGROUND_COLOR = "white";
+const STROKE_COLOR = "black";
+const PIXEL_WIDTH = 50;
+const GRID_WIDTH = 3;
+const CANVAS_WIDTH = PIXEL_WIDTH * GRID_WIDTH;
+#+END_SRC
+
+Any time we draw a fresh grid, we'll want to fill the entire canvas with the background color and then re-draw the lines of the grid.
+
+#+NAME: drawGrid
+#+BEGIN_SRC javascript
+function drawGrid(ctx) {
+    ctx.fillStyle = BACKGROUND_COLOR;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_WIDTH);
+    ctx.strokeStyle = GRID_STROKE_COLOR;
+    for (
+        let x = 0, y = 0;
+        x <= CANVAS_WIDTH;
+        x += PIXEL_WIDTH, y += PIXEL_WIDTH
+    ) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, CANVAS_WIDTH);
+        ctx.moveTo(0, y);
+        ctx.lineTo(CANVAS_WIDTH, y);
+        ctx.stroke();
+    }
+};
+#+END_SRC
+
+Now we can get the canvas element with ~document.getElementById("canvas")~, get the 2d drawing context, and pass that context to our ~drawGrid~ function.
+
+#+NAME: draw grid example
+#+BEGIN_SRC html :tangle iteration1/drawGridExample.html :noweb no-export
+<html>
+  <body style="text-align: center;">
+    <canvas id="canvas" width="150" height="150"></canvas>
+    <script>
+      <<javascript constants>>
+      <<drawGrid>>
+      let canvasEl = document.getElementById("canvas");
+      let context = canvasEl.getContext("2d");
+      drawGrid(context);
+    </script>
+  </body>
+</html>
+#+END_SRC
+
+Ta-da!
+
+#+begin_export html
+<iframe src="iteration1/drawGridExample.html"></iframe>
+#+end_export
+
+But you can't draw on it yet. To draw on it, we'll use Javascript to detect when certain mouse events happen, then we'll draw on the grid when we detect those events.
+
+*** Drawing on the grid
+
+**** Detecting mouse movements and clicks
+
+Once you have access to an HTML element (~document.getElementById("canvas")~ for example), you can equip that element to run certain functions whenever the user interacts with that element in different ways.
+
+#+begin_src javascript
+let body = document.getElementsByTagName("body")[0];
+body.onmousedown = function(event) {
+    console.log(`Mouse clicked down at X: ${event.x} Y: ${event.y}`);
+};
+#+end_src
+
+When someone clicks down on our canvas element, we want to set a flag so that our code knows "the user is engaged in drawing on the canvas". This way, when they move their mouse, we know to color every pixel they move their mouse to.
+
+When the user lets up on the button, we can unset that flag so we know to stop drawing.
+
+And every time the canvas detects the mouse moving, we fill the square that is under the mouse (if the user has the mouse button clicked down).
+
+#+NAME: mouse events
+#+BEGIN_SRC javascript
+function onMouseDown(event, context, canvas) {
+    canvas.isDrawing = true;
+    fillSquare(event, context, canvas);
+}
+
+function onMouseUp(canvas) {
+    canvas.isDrawing = false;
+}
+
+function onMouseMove(event, context, canvas) {
+    if (!canvas.isDrawing) {
+        return;
+    }
+    fillSquare(event, context, canvas);
+}
+#+END_SRC
+
+**** Filling the squares when the mouse is clicked over our canvas
+
+Let's flesh out that ~fillSquare~ function.
+
+Mouse events have a ~clientX~ and ~clientY~ property that represent the pixel coordinates of the mouse. Those coordinates are relative to the applications viewport. For example, clicking on the left edge of the viewable area of a page will always result in a mouse event with a ~clientX~ of ~0~, regardless of whether the page is scrolled horizontally.
+
+We also need to know where the canvas element is in relation to the viewport so that we can draw in the correct square of the grid. Elements have a ~getBoundingClientRect()~ function that returns an object that has ~x~ and ~y~ properties denoting the pixel positions of their left-most and top-most edges.
+
+If the left edge of the canvas is ~100~ pixels to the right of the left edge of the viewport, and if a mouse event has a ~clientX~ between ~100~ and ~120~, then we know the mouse is in the first column of squares of the grid.
+
+#+NAME: fillSquare
+#+BEGIN_SRC javascript :noweb yes
+function fillSquare(mouseEvent, context, canvasElement) {
+    let boundingRect = canvasElement.getBoundingClientRect();
+    let x = mouseEvent.clientX - boundingRect.x;
+    let y = mouseEvent.clientY - boundingRect.y;
+    let xPixel = Math.floor(x / PIXEL_WIDTH);
+    let yPixel = Math.floor(y / PIXEL_WIDTH);
+    context.fillStyle = STROKE_COLOR;
+    context.fillRect(
+        xPixel * PIXEL_WIDTH,
+        yPixel * PIXEL_WIDTH,
+        PIXEL_WIDTH,
+        PIXEL_WIDTH
+    );
+    <<save info about which pixels are colored in>>
+}
+#+END_SRC
+
+Let's try it out!
+
+#+begin_export html
+<iframe src="iteration1/mouseEventsExample.html"></iframe>
+#+end_export
+
+#+BEGIN_SRC html :tangle iteration1/mouseEventsExample.html :noweb no-export
+<html>
+  <body style="text-align: center;">
+    <canvas id="canvas" width="150" height="150"></canvas>
+    <script>
+      <<javascript constants>>
+      <<drawGrid>>
+      let canvasEl = document.getElementById("canvas");
+      let context = canvasEl.getContext("2d");
+      drawGrid(context);
+
+      <<fillSquare>>
+      <<mouse events>>
+      canvasEl.onmousemove = function(event) { onMouseMove(event, context, canvasEl); };
+      canvasEl.onmousedown = function(event) { onMouseDown(event, context, canvasEl); };
+      canvasEl.onmouseup = function(_) { onMouseUp(canvasEl); };
+    </script>
+  </body>
+</html>
+#+END_SRC
+
+We also need a variable to store the information regarding which pixels make up the drawn number.
+
+We can imagine each row in the grid as being a list of values of either ~1~ or ~0~.
+
+If there is ink in the pixel, then the pixel will be represented in the list as ~1~.
+
+If there is no ink coloring the pixel, then the value will be ~0~.
+
+So, if our zero looks like this:
+
+#+begin_example
+111
+101
+111
+#+end_example
+
+Then the list representing the first row will be:
+
+#+begin_example
+[1, 1, 1]
+#+end_example
+
+And the list representing the second row will be:
+
+#+begin_example
+[1, 0, 1]
+#+end_example
+
+And we can combine each of the three rows into an list of lists:
+
+#+begin_example
+[[1, 1, 1],
+ [1, 0, 1],
+ [1, 1, 1]]
+#+end_example
+
+We may eventually need to treat this data in a different structure. But this list of lists is convenient for now.
+
+It will start off empty. Every pixel will have a value of ~0~, representing that there is no "ink" on the canvas. No number has been drawn.
+
+#+BEGIN_SRC javascript :noweb-ref "javascript constants"
+let pixelData = [[0, 0, 0],
+                 [0, 0, 0],
+                 [0, 0, 0]];
+#+END_SRC
+
+Along with coloring the square in the grid, we also want to store the information that we colored a particular pixel in our pixelData that we'll later send to a server to either train our model or make a prediction.
+
+#+NAME: save info about which pixels are colored in
+#+begin_src javascript
+let pixelIndex = yPixel * GRID_WIDTH + xPixel;
+pixelData[pixelIndex] = 1;
+#+end_src
+
+Now we have everything we need to complete our ~onLoadFunction~. In it, we'll do all our initial one-time setup: draw the grid and establish mouse events.
+
+#+NAME: onLoadFunction
+#+BEGIN_SRC javascript :noweb no-export
+function onLoadFunction() {
+    resetCanvas();
+    let canvasEl = document.getElementById("canvas");
+    let context = canvasEl.getContext("2d");
+    canvasEl.onmousemove = function(event) { onMouseMove(event, context, canvasEl); };
+    canvasEl.onmousedown = function(event) { onMouseDown(event, context, canvasEl); };
+    canvasEl.onmouseup = function(_) { onMouseUp(canvasEl); };
+}
+#+END_SRC
+
+For the functionality of clearing the canvas to reset our drawing, we'll simple re-draw the grid and clear out the variable that stores which squares of the grid were colored.
+
+#+NAME: resetCanvas
+#+BEGIN_SRC javascript
+function resetCanvas() {
+    let canvasEl = document.getElementById("canvas");
+    let context = canvasEl.getContext("2d");
+    let gridSize = Math.pow((CANVAS_WIDTH / PIXEL_WIDTH), 2);
+    pixelData = [];
+    while (gridSize--) pixelData.push(0);
+    console.log(pixelData);
+    drawGrid(context);
+}
+#+END_SRC
+
+*** Sending data to the server
+
+#+NAME: server communication
+#+BEGIN_SRC javascript
+<<sendData>>
+<<train>>
+<<predict>>
+#+END_SRC
+
+#+NAME: sendData
+#+BEGIN_SRC javascript
+function sendData(path, json) {
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", `http://${HOST}:${PORT}/${path}`);
+    xhr.onload = function() {
+        if (xhr.status == 200) {
+            let responseJSON = JSON.parse(xhr.responseText);
+            if (responseJSON && responseJSON.type == "predict") {
+                alert(`The neural network predicts you wrote a '${responseJSON.result}'`)
+            }
+        } else {
+            alert(`Server returned status ${xhr.status}.`);
+        }
+    };
+    xhr.onerror = function() {
+        alert(`Error occured while connecting to server: ${xhr.target.statusText}`);
+    };
+    let msg = JSON.stringify(json);
+    xhr.setRequestHeader("Content-Length", msg.length);
+    xhr.setRequestHeader("Connection", "close");
+    xhr.send(msg);
+}
+#+END_SRC
+
+#+NAME: train
+#+BEGIN_SRC javascript
+function train() {
+    let digitValue = document.getElementById("digit").value;
+    if (!digitValue.match(/^\d/)) {
+        alert("Please type and draw a digit in order to train the network.");
+        return;
+    }
+    let json = {
+        image: pixelData,
+        label: digitValue
+    };
+    sendData("train", json);
+}
+#+END_SRC
+
+#+NAME: predict
+#+BEGIN_SRC javascript
+function predict() {
+    if (pixelData.indexOf(1) < 0) {
+        alert("Please draw a digit in order to use prediction.");
+    } else {
+        let json = {
+            image: pixelData,
+        };
+        sendData("predict", json);
+    }
+}
+#+END_SRC
