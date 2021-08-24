@@ -236,11 +236,29 @@ Anyway, this does seem to confirm that the preferences of this unknown person ar
 
 This doesn't seem very... rigorous. I get a sense we're on the right track. But I have a feeling we could poke holes in this if we thought about it some more.
 
+** Is that OK?
+
+Maybe. As long as we recognize the shortcomings of less-than-rigorous logic. Everyone goes down wrong paths before they find the right path to truth. It's fun to explore. Just don't overcommit too soon.
+
 * Learning
 
-** Imagine that we weren't restricted to 24 hours in a day.
+** Are the numbers we get when we multiply someone's hourly preferences by someone's percentage preferences meaningful?
 
+Yes. If it's the same person's hourly and percentage averages, then we expect the sum of the numbers to add up to 24.
 
+That's one way it's meaningful.
+
+If we multiply a particular person's hourly preferences by a particular persons percentage prefences, it might not add up to 24, but it can help us tell two people apart.
+
+For example, in the previous section we saw that:
+
+My percentage prefences multiplied by some unknown person's hourly preferences was 27.
+
+Your percentage preferences multiplied by some unknown person's hourly preferences was 24.
+
+If we were given some known hourly preferences, like [2h 6h 8h 8h], and some unknown percentage preferences (either mine or yours, but we don't know which), we could do the math to figure it out. If the result was 27, we know it was mine.
+
+** What if
 
 * Neural Network
 

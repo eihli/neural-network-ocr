@@ -5,9 +5,6 @@ let ocrDemo = (function() {
     const PIXEL_WIDTH = 50;
     const GRID_WIDTH = 3;
     const CANVAS_WIDTH = PIXEL_WIDTH * GRID_WIDTH;
-    let pixelData = [[0, 0, 0],
-                     [0, 0, 0],
-                     [0, 0, 0]];
     function drawGrid(ctx) {
         ctx.fillStyle = BACKGROUND_COLOR;
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_WIDTH);

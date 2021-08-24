@@ -7,7 +7,7 @@
 
     for (let frame of frames) {
       frame.onload = function() {
-        frame.style.height = frame.contentWindow.document.body.scrollHeight + 'px';
+        frame.style.height = (frame.contentWindow.document.body.scrollHeight + 50) + 'px';
         frame.style.width = frame.contentWindow.document.body.scrollWidth+'px';
       }
     }
@@ -102,6 +102,8 @@ We'll need:
   - add the drawing and its labeled digit to the training data
   - predict what number the drawing represents
 
+Here's what the HTML might look like.
+
 #+begin_src html :tangle iteration1/grid-demo.html :mkdirp yes :noweb yes
 <html>
   <head>
@@ -120,27 +122,30 @@ We'll need:
 </html>
 #+end_src
 
+If you save that code as an HTML file and open it in a browser, you won't see anything yet because we need to write some JavaScript code to draw the grid on the canvas.
+
+In the HTML above, the line containing ~<script src="ocr.js" type="text/javascript"></script>~ tells the browser to look for a file named ~ocr.js~ and make the code in that file available for this webpage.
+
+The line containing ~<body onload="ocrDemo.onLoadFunction()">~ tells the browser to call the ~ocrDemo.onLoadFunction~ when the browser finishes loading the page.
+
+So those are the two things we need to finish before we'll see anything. Then we'll eventually add code to ~ocr.js~ so that when we click the button, ~resetCanvas()~ will clear anything we've drawn on the canvas.
+
 ** Javascript
 
 You'll see the stylesheet linked in the HTML is called ~ocr.js~. Let's create that.
 
-In the body tag, we have an ~onload~ handler that calls ~ocrDemo.onLoadFunction()~. That will
-be the start of the ~ocr.js~ file. But we'll finish the details later.
+In the body tag, we have an ~onload~ handler that calls ~ocrDemo.onLoadFunction()~.
 
-Javascript treats everything defined outside of a function as being in the global namespace. It's a bad habit to pollute the global namespace with things that aren't necessary. So we'll put most of our code inside a function and only put what we absolutely need to in the global namespace.
+That will be the start of the ~ocr.js~ file. But we'll finish the details later.
+
+Javascript treats everything defined outside of a function as being in what's known as the "global namespace". It's a bad habit to add too many things to the global namespace because as a codebase grows large you might things with the same name that do different things. That causes bugs. A solution to this is putting code inside a function, because when you give a name to something inside of the brackets of ~function() { ... }~, then the name only exists inside those brackets; it doesn't exist to any other code.
+
+So here, we'll define a single thing in the global namespace: ~ocrDemo~. It will be equal to the result of calling a function. ~(function () {...})~. Inside the brackets of that function, we'll give names to a bunch of other variables and functions. But then we'll return a JavaScript object that gives us access to the functions that we need. Since we named our global thing ~ocrDemo~, we'll be able to access the things that we set up inside this function as ~ocrDemo.onLoadFunction~, ~ocrDemo.train~, etc...
 
 #+NAME: ocr.js
 #+BEGIN_SRC javascript :tangle iteration1/ocr.js :noweb no-export
 let ocrDemo = (function() {
-    <<javascript constants>>
-    <<drawGrid>>
-    <<fillSquare>>
-    <<mouse events>>
-    <<onLoadFunction>>
-    <<resetCanvas>>
-    <<sendData>>
-    <<train>>
-    <<predict>>
+    <<javascript utilities>>
     return {
         onLoadFunction,
         train,
@@ -150,9 +155,24 @@ let ocrDemo = (function() {
 })();
 #+END_SRC
 
-*** Drawing the grid on canvas
+#+NAME: javascript utilities
+#+begin_src javascript :noweb no-export :exports none
+    <<javascript constants>>
+    <<drawGrid>>
+    <<fillSquare>>
+    <<mouse events>>
+    <<onLoadFunction>>
+    <<resetCanvas>>
+    <<sendData>>
+    <<train>>
+    <<predict>>
+#+end_src
 
-Let's define some constants for coloring the canvas.
+*** Drawing the grid on canvas (<<javascript utilities>>)
+
+Let's put some code inside that function so that we can actually "draw" on the blocks of a grid.
+
+First we'll define some constants for coloring the canvas.
 
 #+BEGIN_SRC javascript :noweb-ref "javascript constants"
 const GRID_STROKE_COLOR = "blue";
@@ -186,10 +206,14 @@ function drawGrid(ctx) {
 };
 #+END_SRC
 
+The ~ctx~ argument of the ~drawGrid~ can be learned about at [[https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D]].
+
 Now we can get the canvas element with ~document.getElementById("canvas")~, get the 2d drawing context, and pass that context to our ~drawGrid~ function.
 
+Note that this example is slightly different than the example above where we are telling the browser to look for a file named ~ocr.js~. Instead, in this example, we are writing javascript directly inside HTML by wrapping it inside ~<script></script>~ tags. I'm only doing this to quickly demonstrate the partial functionality that we have with the ~drawGrid~ function.
+
 #+NAME: draw grid example
-#+BEGIN_SRC html :tangle iteration1/drawGridExample.html :noweb no-export
+#+BEGIN_SRC html :tangle iteration1/drawGridExample.html :noweb yes
 <html>
   <body style="text-align: center;">
     <canvas id="canvas" width="150" height="150"></canvas>
@@ -227,7 +251,7 @@ body.onmousedown = function(event) {
 
 When someone clicks down on our canvas element, we want to set a flag so that our code knows "the user is engaged in drawing on the canvas". This way, when they move their mouse, we know to color every pixel they move their mouse to.
 
-When the user lets up on the button, we can unset that flag so we know to stop drawing.
+When the user releases the button, we can unset that flag so we know to stop drawing.
 
 And every time the canvas detects the mouse moving, we fill the square that is under the mouse (if the user has the mouse button clicked down).
 
@@ -260,6 +284,22 @@ We also need to know where the canvas element is in relation to the viewport so 
 
 If the left edge of the canvas is ~100~ pixels to the right of the left edge of the viewport, and if a mouse event has a ~clientX~ between ~100~ and ~120~, then we know the mouse is in the first column of squares of the grid.
 
+#+NAME: helper code to show values of different variables
+#+begin_src javascript :noweb yes :exports code
+if (document.getElementById("tooltip")) {
+    document.getElementById("tooltip").remove();
+}
+let tooltip = document.createElement("div");
+tooltip.id = "tooltip"
+tooltip.style.position = "fixed";
+tooltip.style.background = "white";
+let body = document.getElementsByTagName("body")[0];
+tooltip.innerHTML = `Mouse X: ${x}<br>Mouse Y: ${y}<br>Bounding Rect X: ${boundingRect.x}<br>Bounding Rect Y: ${boundingRect.y}<br>Pixel: [${xPixel}, ${yPixel}]`;
+tooltip.style.top = event.clientY;
+tooltip.style.left = event.clientX;
+body.append(tooltip);
+#+end_src
+
 #+NAME: fillSquare
 #+BEGIN_SRC javascript :noweb yes
 function fillSquare(mouseEvent, context, canvasElement) {
@@ -290,6 +330,7 @@ Let's try it out!
   <body style="text-align: center;">
     <canvas id="canvas" width="150" height="150"></canvas>
     <script>
+      let foo = 0;
       <<javascript constants>>
       <<drawGrid>>
       let canvasEl = document.getElementById("canvas");
