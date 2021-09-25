@@ -86,7 +86,7 @@ We'll need:
 
 * Javascript
 
-You'll see the stylesheet linked in the HTML is called ~ocr.js~. Let's create that.
+You'll see the Javascript file linked in the HTML is called ~ocr.js~. Let's create that.
 
 In the body tag, we have an ~onload~ handler that calls ~ocrDemo.onLoadFunction()~. That will
 be the start of the ~ocr.js~ file. But we'll finish the details later.
@@ -120,16 +120,18 @@ Let's define some constants for coloring the canvas.
 
 #+BEGIN_SRC javascript :noweb-ref "javascript constants"
 const GRID_STROKE_COLOR = "blue";
-const BACKGROUND_COLOR = "black";
-const STROKE_COLOR = "white";
-const PIXEL_WIDTH = 8;
-const GRID_WIDTH = 28;
+const BACKGROUND_COLOR = "white";
+const STROKE_COLOR = "black";
+const PIXEL_WIDTH = 50;
+const GRID_WIDTH = 3;
 const CANVAS_WIDTH = PIXEL_WIDTH * GRID_WIDTH;
-const HOST = "localhost";
-const PORT = "8888";
 #+END_SRC
 
-Any time we draw a fresh grid, we'll want to fill the entire canvas with the background color and then re-draw the lines of the grid.
+Any time we draw a fresh grid, for example when we reset the canvas or refresh the page, we'll want to fill the entire canvas with the background color and then re-draw the lines of the grid.
+
+This ~drawGrid~ function will take a Javascript ~CanvasRenderingContext2D~ interface object as described at https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D.
+
+The context object has methods like ~fillStyle~ to set the color of the background, ~strokeStyle~ to set the color of the lines that you draw, etc...
 
 #+NAME: drawGrid
 #+BEGIN_SRC javascript
@@ -138,8 +140,8 @@ function drawGrid(ctx) {
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_WIDTH);
     ctx.strokeStyle = GRID_STROKE_COLOR;
     for (
-        let x = PIXEL_WIDTH, y = PIXEL_WIDTH;
-        x < CANVAS_WIDTH;
+        let x = 0, y = 0;
+        x <= CANVAS_WIDTH;
         x += PIXEL_WIDTH, y += PIXEL_WIDTH
     ) {
         ctx.beginPath();
@@ -392,6 +394,46 @@ function predict() {
 }
 #+END_SRC
 
+* Neural Network Code
+
+#+begin_src javascript :tangle neuralNetwork.js
+const INPUT_NODE_COUNT = 9; // 1 input node for each pixel
+const HIDDEN_NODE_COUT = 6; // chosen relatively arbitrarily
+const OUTPUT_NODE_COUNT = 2; // 0 or 1
+
+const IDEAL_ZERO = [[1, 1, 1],
+                    [1, 0, 1],
+                    [1, 1, 1]];
+
+const IDEAL_ONE  = [[0, 1, 0],
+                    [0, 1, 0],
+                    [0, 1, 0]];
+
+// Weights should be initialized to random values.
+let weights = [[0, 0, 0],
+               [0, 0, 0],
+               [0, 0, 0]];
+
+function flatten(grid) {
+  return Array.prototype.concat.apply([], grid);
+}
+
+function inputVectorDotProductWeightsMatrix(inputs, weights) {
+  let result = [];
+  inputs.reduce((runningSum, currentInputValue, weightsIndex) => {
+    return runningSum + (currentInputValue * weights[weightsIndex][inputIndex]);
+  }, 0)
+}
+
+let neural_network = OCRNeuralNetwork(
+  INPUT_NODE_COUNT,
+  HIDDEN_NODE_COUNT,
+  OUTPUT_NODE_COUNT,
+  "neuralNetwork.json"
+)
+#+end_src
+
+
 * Python Server
 
 #+BEGIN_SRC python :tangle server.py
@@ -463,10 +505,11 @@ if __name__ == "__main__":
 
 ** Requirements
 
-Matplotlib and Numpy are two external requirements we'll need.
+Numpy is the only external requirement we'll need.
+
+Numpy provides some useful functions for operating on 2-dimensional arrays, like the data structure behind our pixels that stores which pixels are "drawn" and which are "empty" as part of the handwritten "1" or "0".
 
 #+BEGIN_SRC plaintext :tangle requirements.txt
-matplotlib
 numpy
 #+END_SRC
 
@@ -736,8 +779,6 @@ import math
 import random
 import os
 import json
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 import numpy as np
 
 def initialize_mnist(neural_network, training_count=1000):

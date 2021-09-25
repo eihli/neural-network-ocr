@@ -2,11 +2,9 @@ let ocrDemo = (function() {
     const GRID_STROKE_COLOR = "blue";
     const BACKGROUND_COLOR = "white";
     const STROKE_COLOR = "black";
-    const PIXEL_WIDTH = 8;
-    const GRID_WIDTH = 28;
+    const PIXEL_WIDTH = 50;
+    const GRID_WIDTH = 3;
     const CANVAS_WIDTH = PIXEL_WIDTH * GRID_WIDTH;
-    const HOST = "localhost";
-    const PORT = "8888";
     let pixelData = [[0, 0, 0],
                      [0, 0, 0],
                      [0, 0, 0]];

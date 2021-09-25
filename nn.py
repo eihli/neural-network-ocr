@@ -4,8 +4,6 @@ import math
 import random
 import os
 import json
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 import numpy as np
 
 def initialize_mnist(neural_network, training_count=1000):
