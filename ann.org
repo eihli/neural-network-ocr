@@ -1,44 +1,16 @@
-#+TITLE: A Simple And Intuitive Intro To Neural Networks (Python, HTML, Javascript)
+#+TITLE: Artificial Neural Network From Scratch
 
-#+begin_export html
-<script type="text/javascript">
-  function adjustIframes() {
-    let frames = document.getElementsByTagName("iframe");
-
-    for (let frame of frames) {
-      frame.onload = function() {
-        frame.style.height = frame.contentWindow.document.body.scrollHeight + 'px';
-        frame.style.width = frame.contentWindow.document.body.scrollWidth+'px';
-      }
-    }
-  }
-  document.addEventListener("DOMContentLoaded", (event) => {
-    adjustIframes();
-  })
-</script>
-#+end_export
-
-* A Simple And Intuitive Intro To Neural Networks (Python, HTML, Javascript)
+* A Simple And Intuitive Guide To Neural Networks (Python, HTML, Javascript)
 
 You can create a webpage in HTML and Javascript that will let you draw a number, and you can write the server software and a neural network to tell you what number you drew.
 
 I won't use words like "differentiable".
 
-
-I'll take you through all of the steps, thought, and code in order to have a webpage where you can draw a digit between 0 and 9 and have a neural network tell you what digit you drew.
-
-I won't use words like "derivative" or "differentiable" or "gradient".
-
-This will be built from the ground, intuitively.
-
-We'll start by creating an HTML page with a canvas that we can draw on.
-
-Feel free to jump straight to the machine learning secion if you're more interested in that.
-
-* Iteration 1
-** HTML
+* HTML
 
 We need something to draw on.
+
+If you're not familiar with what a "pixel" is, take a moment to look that up.
 
 We are going to start with the simplest "canvas" that can represent "one" and "zero" in any meaningful way.
 
@@ -50,7 +22,7 @@ It will be canvas of 3 pixels wide by 3 pixels high.
 000
 #+end_example
 
-As we "draw" on this canvas, our "pencil" (mouse pointer) will turn the pixels from 0 to 1.
+Our "pencil" will turn the pixels from 0 to 1.
 
 An ideal zero in this 3x3 grid will look like this:
 
@@ -68,28 +40,15 @@ And an ideal one will look like this:
 010
 #+end_example
 
-We'll also want to train our neural network to recognize imperfect ones and zeros, like this:
-
-#+begin_example
-100
-010
-010
-#+end_example
-
-
-But since we are presenting this canvas on a webpage for users to draw on, the pixels can't literally be single pixels.
+But since we are presenting this canvas to users to draw on, the pixels can't literally be single pixels.
 
 We can take a chunk of pixels on screen, a 50x50 square of pixels for example, and treat that entire chunk as a single pixel.
 
-So the frontend will show a 150x150 pixel canvas. But it will be represented in our code for matters computational as a 3x3 pixel grid of ~1~s and ~0~s.
-
-Knowing the best format to display something on the frontend, the best format to store something on the backend, and the best way to translate between the two is a valuable skill. Keep it in mind throughout your work.
+So we'll display a 3x3 grid that represents 9 of our pixels, but they will be represented on screen as a 3x3 grid of 50x50 "actual monitor" pixels.
 
 In the end, it will look like this:
 
-#+begin_export html
-<iframe src="iteration1/ocr.html"></iframe>
-#+end_export
+TODO: INSERT IFRAME
 
 The details of the pixel coloring/scaling will be handled in some Javascript later. For now, let's just create an HTML file to work with.
 
@@ -100,122 +59,6 @@ We'll need:
   - reset the canvas
   - add the drawing and its labeled digit to the training data
   - predict what number the drawing represents
-
-#+begin_src html :tangle iteration1/ocr.html :mkdirp yes :noweb yes
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <script src="iteration1/ocr.js" type="text/javascript"></script>
-    <link rel="stylesheet" href="ocr.css" type="text/css" media="screen" />
-    <title>OCR Demo</title>
-  </head>
-  <body onload="ocrDemo.onLoadFunction()">
-    <div id="main-container" style="text-align: center;">
-      <h1>OCR Demo</h1>
-      <canvas id="canvas" width="200" height="200"></canvas>
-      <form name="input">
-        <label for="digit">Digit:</label>
-        <input type="text" id="digit">
-        <input type="button" value="Train" onclick="ocrDemo.train()">
-        <input type="button" value="Predict" onclick="ocrDemo.predict()">
-        <input type="button" value="Reset" onclick="ocrDemo.resetCanvas()">
-      </form>
-    </div>
-  </body>
-</html>
-#+end_src
-
-** Javascript
-
-You'll see the stylesheet linked in the HTML is called ~ocr.js~. Let's create that.
-
-In the body tag, we have an ~onload~ handler that calls ~ocrDemo.onLoadFunction()~. That will
-be the start of the ~ocr.js~ file. But we'll finish the details later.
-
-Javascript treats everything defined outside of a function as being in the global namespace. It's a bad habit to pollute the global namespace with things that aren't necessary. So we'll put most of our code inside a function and only put what we absolutely need to in the global namespace.
-
-#+NAME: ocr.js
-#+BEGIN_SRC javascript :tangle iteration1/ocr.js :noweb no-export
-let ocrDemo = (function() {
-    <<javascript constants iteration 1>>
-    <<drawGrid>>
-    <<fillSquare>>
-    <<mouse events>>
-    <<onLoadFunction>>
-    <<resetCanvas>>
-    <<sendData>>
-    <<train>>
-    <<predict>>
-    return {
-        onLoadFunction,
-        train,
-        predict,
-        resetCanvas
-    };
-})();
-#+END_SRC
-
-*** Drawing the grid on canvas
-
-Let's define some constants for coloring the canvas.
-
-#+BEGIN_SRC javascript :noweb-ref "javascript constants iteration 1"
-const GRID_STROKE_COLOR = "blue";
-const BACKGROUND_COLOR = "white";
-const STROKE_COLOR = "black";
-const PIXEL_WIDTH = 50;
-const GRID_WIDTH = 3;
-const CANVAS_WIDTH = PIXEL_WIDTH * GRID_WIDTH;
-#+END_SRC
-
-Any time we draw a fresh grid, we'll want to fill the entire canvas with the background color and then re-draw the lines of the grid.
-
-#+NAME: drawGrid
-#+BEGIN_SRC javascript
-function drawGrid(ctx) {
-    ctx.fillStyle = BACKGROUND_COLOR;
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_WIDTH);
-    ctx.strokeStyle = GRID_STROKE_COLOR;
-    for (
-        let x = 0, y = 0;
-        x <= CANVAS_WIDTH;
-        x += PIXEL_WIDTH, y += PIXEL_WIDTH
-    ) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, CANVAS_WIDTH);
-        ctx.moveTo(0, y);
-        ctx.lineTo(CANVAS_WIDTH, y);
-        ctx.stroke();
-    }
-};
-#+END_SRC
-
-#+NAME: draw grid example
-#+BEGIN_SRC html :tangle iteration1/drawGridExample.html :noweb no-export
-<html>
-  <body>
-    <canvas id="canvas" width="200" height="200"></canvas>
-    <script>
-      <<javascript constants>>
-      <<drawGrid>>
-      let canvasEl = document.getElementById("canvas");
-      let context = canvasEl.getContext("2d");
-      drawGrid(context);
-    </script>
-  </body>
-</html>
-#+END_SRC
-
-Let's see what the grid looks like at [[./iteration1/drawGridExample.html]]
-
-#+begin_export html
-<iframe src="iteration1/drawGridExample.html"></iframe>
-#+end_export
-
-
-* Iteration 2
-** HTML
 
 #+BEGIN_SRC html :tangle ocr.html :mkdirp yes :noweb yes
 <html>
@@ -241,7 +84,7 @@ Let's see what the grid looks like at [[./iteration1/drawGridExample.html]]
 </html>
 #+END_SRC
 
-** Javascript
+* Javascript
 
 You'll see the stylesheet linked in the HTML is called ~ocr.js~. Let's create that.
 
@@ -271,14 +114,14 @@ let ocrDemo = (function() {
 })();
 #+END_SRC
 
-*** Drawing the grid on canvas
+** Drawing the grid on canvas
 
 Let's define some constants for coloring the canvas.
 
 #+BEGIN_SRC javascript :noweb-ref "javascript constants"
 const GRID_STROKE_COLOR = "blue";
-const BACKGROUND_COLOR = "white";
-const STROKE_COLOR = "black";
+const BACKGROUND_COLOR = "black";
+const STROKE_COLOR = "white";
 const PIXEL_WIDTH = 8;
 const GRID_WIDTH = 28;
 const CANVAS_WIDTH = PIXEL_WIDTH * GRID_WIDTH;
@@ -295,8 +138,8 @@ function drawGrid(ctx) {
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_WIDTH);
     ctx.strokeStyle = GRID_STROKE_COLOR;
     for (
-        let x = 0, y = 0;
-        x <= CANVAS_WIDTH;
+        let x = PIXEL_WIDTH, y = PIXEL_WIDTH;
+        x < CANVAS_WIDTH;
         x += PIXEL_WIDTH, y += PIXEL_WIDTH
     ) {
         ctx.beginPath();
@@ -331,7 +174,7 @@ Let's see what the grid looks like at [[./drawGridExample.html]]
 <iframe src="drawGridExample.html"></iframe>
 #+end_export
 
-*** Drawing on the grid
+** Drawing on the grid
 
 Let's write a function that will take a mouse event and a canvas element and will fill a square of the grid.
 
@@ -485,7 +328,7 @@ function resetCanvas() {
 }
 #+END_SRC
 
-*** Sending data to the server
+** Sending data to the server
 
 #+NAME: server communication
 #+BEGIN_SRC javascript
