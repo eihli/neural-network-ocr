@@ -1,0 +1,6 @@
+data/mnist-dataLabels.csv filter=lfs diff=lfs merge=lfs -text
+data/mnist_test.csv filter=lfs diff=lfs merge=lfs -text
+data/mnist_test.csv.zip filter=lfs diff=lfs merge=lfs -text
+data/mnist_train.csv filter=lfs diff=lfs merge=lfs -text
+data/mnist_train.csv.zip filter=lfs diff=lfs merge=lfs -text
+data/mnist-data.csv filter=lfs diff=lfs merge=lfs -text
