@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-08-24 Tue 15:31 -->
+<!-- 2021-09-25 Sat 10:17 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>A Simple And Intuitive Intro To Neural Networks (Python, HTML, Javascript)</title>
+<title>Artificial Neural Network From Scratch</title>
 <meta name="author" content="Eric Ihli" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -196,79 +196,50 @@
 </head>
 <body>
 <div id="content" class="content">
-<h1 class="title">A Simple And Intuitive Intro To Neural Networks (Python, HTML, Javascript)</h1>
+<h1 class="title">Artificial Neural Network From Scratch</h1>
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgcc4c0ab">1. A Simple And Intuitive Intro To Neural Networks (Python, HTML, Javascript)</a></li>
-<li><a href="#orgf3b2964">2. Iteration 1</a>
+<li><a href="#orgd3a4299">1. A Simple And Intuitive Guide To Neural Networks (Python, HTML, Javascript)</a></li>
+<li><a href="#org20530f1">2. HTML</a></li>
+<li><a href="#orge7a1eb8">3. Javascript</a>
 <ul>
-<li><a href="#org82f8a21">2.1. HTML</a></li>
-<li><a href="#orgca69cd9">2.2. Javascript</a>
-<ul>
-<li><a href="#org05b0930">2.2.1. Drawing the grid on canvas</a></li>
+<li><a href="#orgccfc3f9">3.1. Drawing the grid on canvas</a></li>
+<li><a href="#org2aa16ff">3.2. Drawing on the grid</a></li>
+<li><a href="#orgef4e025">3.3. Sending data to the server</a></li>
 </ul>
 </li>
+<li><a href="#org7bb7933">4. Python Server</a></li>
+<li><a href="#orgaa6d335">5. Neural Network</a>
+<ul>
+<li><a href="#orgcf5204a">5.1. Requirements</a></li>
+<li><a href="#orga7df0ae">5.2. What is an Artificial Neural Network?</a>
+<ul>
+<li><a href="#orga5862d0">5.2.1. The &ldquo;Model&rdquo; <b>is</b> the weights&#x2026;</a></li>
 </ul>
 </li>
-<li><a href="#org5b34a2b">3. Iteration 2</a>
+<li><a href="#orgbd78351">5.3. Implementing a single Perceptron</a></li>
+<li><a href="#org42d6f0b">5.4. How to tell if data is linealy seperable?</a>
 <ul>
-<li><a href="#org81e57e9">3.1. HTML</a></li>
-<li><a href="#orgbd14d82">3.2. Javascript</a>
-<ul>
-<li><a href="#org9c793e7">3.2.1. Drawing the grid on canvas</a></li>
-<li><a href="#org48b9927">3.2.2. Drawing on the grid</a></li>
-<li><a href="#org87d8374">3.2.3. Sending data to the server</a></li>
+<li><a href="#orgee4e0f9">5.4.1. XOR example</a></li>
 </ul>
 </li>
+<li><a href="#org28d451e">5.5. Backpropagation</a>
+<ul>
+<li><a href="#orgf72ee04">5.5.1. Imports</a></li>
+<li><a href="#org072a6b9">5.5.2. Helper</a></li>
 </ul>
 </li>
-<li><a href="#org4cd700f">4. Python Server</a></li>
-<li><a href="#orgc04032d">5. Neural Network</a>
-<ul>
-<li><a href="#orgf911428">5.1. Requirements</a></li>
-<li><a href="#orgab266f2">5.2. What is an Artificial Neural Network?</a>
-<ul>
-<li><a href="#org59c7e26">5.2.1. The &ldquo;Model&rdquo; <b>is</b> the weights&#x2026;</a></li>
-</ul>
-</li>
-<li><a href="#orgb6808d7">5.3. Implementing a single Perceptron</a></li>
-<li><a href="#orga0f4001">5.4. How to tell if data is linealy seperable?</a>
-<ul>
-<li><a href="#orga821fe5">5.4.1. XOR example</a></li>
-</ul>
-</li>
-<li><a href="#org5f0b7fb">5.5. Backpropagation</a>
-<ul>
-<li><a href="#org898ae04">5.5.1. Imports</a></li>
-<li><a href="#org1a5859e">5.5.2. Helper</a></li>
-</ul>
-</li>
-<li><a href="#orgdbba085">5.6. MNIST OCR Neural Network</a></li>
+<li><a href="#orgbb947a1">5.6. MNIST OCR Neural Network</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<script type="text/javascript">
-  function adjustIframes() {
-    let frames = document.getElementsByTagName("iframe");
 
-    for (let frame of frames) {
-      frame.onload = function() {
-        frame.style.height = frame.contentWindow.document.body.scrollHeight + 'px';
-        frame.style.width = frame.contentWindow.document.body.scrollWidth+'px';
-      }
-    }
-  }
-  document.addEventListener("DOMContentLoaded", (event) => {
-    adjustIframes();
-  })
-</script>
-
-<div id="outline-container-orgcc4c0ab" class="outline-2">
-<h2 id="orgcc4c0ab"><span class="section-number-2">1.</span> A Simple And Intuitive Intro To Neural Networks (Python, HTML, Javascript)</h2>
+<div id="outline-container-orgd3a4299" class="outline-2">
+<h2 id="orgd3a4299"><span class="section-number-2">1.</span> A Simple And Intuitive Guide To Neural Networks (Python, HTML, Javascript)</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 You can create a webpage in HTML and Javascript that will let you draw a number, and you can write the server software and a neural network to tell you what number you drew.
@@ -277,39 +248,18 @@ You can create a webpage in HTML and Javascript that will let you draw a number,
 <p>
 I won&rsquo;t use words like &ldquo;differentiable&rdquo;.
 </p>
-
-
-<p>
-I&rsquo;ll take you through all of the steps, thought, and code in order to have a webpage where you can draw a digit between 0 and 9 and have a neural network tell you what digit you drew.
-</p>
-
-<p>
-I won&rsquo;t use words like &ldquo;derivative&rdquo; or &ldquo;differentiable&rdquo; or &ldquo;gradient&rdquo;.
-</p>
-
-<p>
-This will be built from the ground, intuitively.
-</p>
-
-<p>
-We&rsquo;ll start by creating an HTML page with a canvas that we can draw on.
-</p>
-
-<p>
-Feel free to jump straight to the machine learning secion if you&rsquo;re more interested in that.
-</p>
 </div>
 </div>
 
-<div id="outline-container-orgf3b2964" class="outline-2">
-<h2 id="orgf3b2964"><span class="section-number-2">2.</span> Iteration 1</h2>
+<div id="outline-container-org20530f1" class="outline-2">
+<h2 id="org20530f1"><span class="section-number-2">2.</span> HTML</h2>
 <div class="outline-text-2" id="text-2">
-</div>
-<div id="outline-container-org82f8a21" class="outline-3">
-<h3 id="org82f8a21"><span class="section-number-3">2.1.</span> HTML</h3>
-<div class="outline-text-3" id="text-2-1">
 <p>
 We need something to draw on.
+</p>
+
+<p>
+If you&rsquo;re not familiar with what a &ldquo;pixel&rdquo; is, take a moment to look that up.
 </p>
 
 <p>
@@ -320,21 +270,21 @@ We are going to start with the simplest &ldquo;canvas&rdquo; that can represent 
 It will be canvas of 3 pixels wide by 3 pixels high.
 </p>
 
-<pre class="example" id="org9a981b3">
+<pre class="example" id="orgbad3c34">
 000
 000
 000
 </pre>
 
 <p>
-As we &ldquo;draw&rdquo; on this canvas, our &ldquo;pencil&rdquo; (mouse pointer) will turn the pixels from 0 to 1.
+Our &ldquo;pencil&rdquo; will turn the pixels from 0 to 1.
 </p>
 
 <p>
 An ideal zero in this 3x3 grid will look like this:
 </p>
 
-<pre class="example" id="org2d43d87">
+<pre class="example" id="orgbc51d85">
 111
 101
 111
@@ -344,25 +294,14 @@ An ideal zero in this 3x3 grid will look like this:
 And an ideal one will look like this:
 </p>
 
-<pre class="example" id="org2523bcc">
+<pre class="example" id="orga5eba1b">
 010
 010
 010
 </pre>
 
 <p>
-We&rsquo;ll also want to train our neural network to recognize imperfect ones and zeros, like this:
-</p>
-
-<pre class="example" id="org45405a1">
-100
-010
-010
-</pre>
-
-
-<p>
-But since we are presenting this canvas on a webpage for users to draw on, the pixels can&rsquo;t literally be single pixels.
+But since we are presenting this canvas to users to draw on, the pixels can&rsquo;t literally be single pixels.
 </p>
 
 <p>
@@ -370,18 +309,16 @@ We can take a chunk of pixels on screen, a 50x50 square of pixels for example, a
 </p>
 
 <p>
-So the frontend will show a 150x150 pixel canvas. But it will be represented in our code for matters computational as a 3x3 pixel grid of ~1~s and ~0~s.
-</p>
-
-<p>
-Knowing the best format to display something on the frontend, the best format to store something on the backend, and the best way to translate between the two is a valuable skill. Keep it in mind throughout your work.
+So we&rsquo;ll display a 3x3 grid that represents 9 of our pixels, but they will be represented on screen as a 3x3 grid of 50x50 &ldquo;actual monitor&rdquo; pixels.
 </p>
 
 <p>
 In the end, it will look like this:
 </p>
 
-<iframe src="iteration1/ocr.html"></iframe>
+<p>
+TODO: INSERT IFRAME
+</p>
 
 <p>
 The details of the pixel coloring/scaling will be handled in some Javascript later. For now, let&rsquo;s just create an HTML file to work with.
@@ -401,147 +338,6 @@ We&rsquo;ll need:
 </ul></li>
 </ul>
 
-<div class="org-src-container">
-<pre class="src src-html">&lt;<span style="color: #c678dd;">html</span>&gt;
-  &lt;<span style="color: #c678dd;">head</span>&gt;
-    &lt;<span style="color: #c678dd;">meta</span> <span style="color: #dcaeea;">charset</span>=<span style="color: #98be65;">"UTF-8"</span>&gt;
-    &lt;<span style="color: #c678dd;">script</span> <span style="color: #dcaeea;">src</span>=<span style="color: #98be65;">"iteration1/ocr.js"</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"text/javascript"</span>&gt;&lt;/<span style="color: #c678dd;">script</span>&gt;
-    &lt;<span style="color: #c678dd;">link</span> <span style="color: #dcaeea;">rel</span>=<span style="color: #98be65;">"stylesheet"</span> <span style="color: #dcaeea;">href</span>=<span style="color: #98be65;">"ocr.css"</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"text/css"</span> <span style="color: #dcaeea;">media</span>=<span style="color: #98be65;">"screen"</span> /&gt;
-    &lt;<span style="color: #c678dd;">title</span>&gt;<span style="font-weight: bold; text-decoration: underline;">OCR Demo</span>&lt;/<span style="color: #c678dd;">title</span>&gt;
-  &lt;/<span style="color: #c678dd;">head</span>&gt;
-  &lt;<span style="color: #c678dd;">body</span> <span style="color: #dcaeea;">onload</span>=<span style="color: #98be65;">"ocrDemo.onLoadFunction()"</span>&gt;
-    &lt;<span style="color: #c678dd;">div</span> <span style="color: #dcaeea;">id</span>=<span style="color: #98be65;">"main-container"</span> <span style="color: #dcaeea;">style</span>=<span style="color: #98be65;">"text-align: center;"</span>&gt;
-      &lt;<span style="color: #c678dd;">h1</span>&gt;<span style="font-weight: bold; text-decoration: underline;">OCR Demo</span>&lt;/<span style="color: #c678dd;">h1</span>&gt;
-      &lt;<span style="color: #c678dd;">canvas</span> <span style="color: #dcaeea;">id</span>=<span style="color: #98be65;">"canvas"</span> <span style="color: #dcaeea;">width</span>=<span style="color: #98be65;">"200"</span> <span style="color: #dcaeea;">height</span>=<span style="color: #98be65;">"200"</span>&gt;&lt;/<span style="color: #c678dd;">canvas</span>&gt;
-      &lt;<span style="color: #c678dd;">form</span> <span style="color: #dcaeea;">name</span>=<span style="color: #98be65;">"input"</span>&gt;
-        &lt;<span style="color: #c678dd;">label</span> <span style="color: #dcaeea;">for</span>=<span style="color: #98be65;">"digit"</span>&gt;Digit:&lt;/<span style="color: #c678dd;">label</span>&gt;
-        &lt;<span style="color: #c678dd;">input</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"text"</span> <span style="color: #dcaeea;">id</span>=<span style="color: #98be65;">"digit"</span>&gt;
-        &lt;<span style="color: #c678dd;">input</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"button"</span> <span style="color: #dcaeea;">value</span>=<span style="color: #98be65;">"Train"</span> <span style="color: #dcaeea;">onclick</span>=<span style="color: #98be65;">"ocrDemo.train()"</span>&gt;
-        &lt;<span style="color: #c678dd;">input</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"button"</span> <span style="color: #dcaeea;">value</span>=<span style="color: #98be65;">"Predict"</span> <span style="color: #dcaeea;">onclick</span>=<span style="color: #98be65;">"ocrDemo.predict()"</span>&gt;
-        &lt;<span style="color: #c678dd;">input</span> <span style="color: #dcaeea;">type</span>=<span style="color: #98be65;">"button"</span> <span style="color: #dcaeea;">value</span>=<span style="color: #98be65;">"Reset"</span> <span style="color: #dcaeea;">onclick</span>=<span style="color: #98be65;">"ocrDemo.resetCanvas()"</span>&gt;
-      &lt;/<span style="color: #c678dd;">form</span>&gt;
-    &lt;/<span style="color: #c678dd;">div</span>&gt;
-  &lt;/<span style="color: #c678dd;">body</span>&gt;
-&lt;/<span style="color: #c678dd;">html</span>&gt;
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-orgca69cd9" class="outline-3">
-<h3 id="orgca69cd9"><span class="section-number-3">2.2.</span> Javascript</h3>
-<div class="outline-text-3" id="text-2-2">
-<p>
-You&rsquo;ll see the stylesheet linked in the HTML is called <code>ocr.js</code>. Let&rsquo;s create that.
-</p>
-
-<p>
-In the body tag, we have an <code>onload</code> handler that calls <code>ocrDemo.onLoadFunction()</code>. That will
-be the start of the <code>ocr.js</code> file. But we&rsquo;ll finish the details later.
-</p>
-
-<p>
-Javascript treats everything defined outside of a function as being in the global namespace. It&rsquo;s a bad habit to pollute the global namespace with things that aren&rsquo;t necessary. So we&rsquo;ll put most of our code inside a function and only put what we absolutely need to in the global namespace.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-javascript" id="orgd11dd4f"><span style="color: #51afef;">let</span> <span style="color: #dcaeea;">ocrDemo</span> = (<span style="color: #51afef;">function</span>() {
-    &lt;&lt;javascript constants iteration <span style="color: #da8548; font-weight: bold;">1</span>&gt;&gt;
-    &lt;&lt;drawGrid&gt;&gt;
-    &lt;&lt;fillSquare&gt;&gt;
-    &lt;&lt;mouse events&gt;&gt;
-    &lt;&lt;onLoadFunction&gt;&gt;
-    &lt;&lt;resetCanvas&gt;&gt;
-    &lt;&lt;sendData&gt;&gt;
-    &lt;&lt;train&gt;&gt;
-    &lt;&lt;predict&gt;&gt;
-    <span style="color: #51afef;">return</span> {
-        onLoadFunction,
-        train,
-        predict,
-        resetCanvas
-    };
-})();
-</pre>
-</div>
-</div>
-
-<div id="outline-container-org05b0930" class="outline-4">
-<h4 id="org05b0930"><span class="section-number-4">2.2.1.</span> Drawing the grid on canvas</h4>
-<div class="outline-text-4" id="text-2-2-1">
-<p>
-Let&rsquo;s define some constants for coloring the canvas.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #51afef;">const</span> <span style="color: #dcaeea;">GRID_STROKE_COLOR</span> = <span style="color: #98be65;">"blue"</span>;
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">BACKGROUND_COLOR</span> = <span style="color: #98be65;">"white"</span>;
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">STROKE_COLOR</span> = <span style="color: #98be65;">"black"</span>;
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">PIXEL_WIDTH</span> = <span style="color: #da8548; font-weight: bold;">50</span>;
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">GRID_WIDTH</span> = <span style="color: #da8548; font-weight: bold;">3</span>;
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">CANVAS_WIDTH</span> = PIXEL_WIDTH * GRID_WIDTH;
-</pre>
-</div>
-
-<p>
-Any time we draw a fresh grid, we&rsquo;ll want to fill the entire canvas with the background color and then re-draw the lines of the grid.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-javascript" id="orgb9fe93e"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">drawGrid</span>(<span style="color: #dcaeea;">ctx</span>) {
-    ctx.fillStyle = BACKGROUND_COLOR;
-    ctx.fillRect(<span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">0</span>, CANVAS_WIDTH, CANVAS_WIDTH);
-    ctx.strokeStyle = GRID_STROKE_COLOR;
-    <span style="color: #51afef;">for</span> (
-        <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">x</span> = <span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #dcaeea;">y</span> = <span style="color: #da8548; font-weight: bold;">0</span>;
-        x &lt;= CANVAS_WIDTH;
-        x += PIXEL_WIDTH, y += PIXEL_WIDTH
-    ) {
-        ctx.beginPath();
-        ctx.moveTo(x, <span style="color: #da8548; font-weight: bold;">0</span>);
-        ctx.lineTo(x, CANVAS_WIDTH);
-        ctx.moveTo(<span style="color: #da8548; font-weight: bold;">0</span>, y);
-        ctx.lineTo(CANVAS_WIDTH, y);
-        ctx.stroke();
-    }
-};
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-html" id="orgad9a579">&lt;<span style="color: #c678dd;">html</span>&gt;
-  &lt;<span style="color: #c678dd;">body</span>&gt;
-    &lt;<span style="color: #c678dd;">canvas</span> <span style="color: #dcaeea;">id</span>=<span style="color: #98be65;">"canvas"</span> <span style="color: #dcaeea;">width</span>=<span style="color: #98be65;">"200"</span> <span style="color: #dcaeea;">height</span>=<span style="color: #98be65;">"200"</span>&gt;&lt;/<span style="color: #c678dd;">canvas</span>&gt;
-    &lt;<span style="color: #c678dd;">script</span>&gt;
-      &lt;&lt;<span style="color: #c678dd;">javascript</span> constants&gt;&gt;
-      &lt;&lt;<span style="color: #c678dd;">drawGrid</span>&gt;&gt;
-      let canvasEl = document.getElementById("canvas");
-      let context = canvasEl.getContext("2d");
-      drawGrid(context);
-    &lt;/<span style="color: #c678dd;">script</span>&gt;
-  &lt;/<span style="color: #c678dd;">body</span>&gt;
-&lt;/<span style="color: #c678dd;">html</span>&gt;
-</pre>
-</div>
-
-<p>
-Let&rsquo;s see what the grid looks like at <a href="./iteration1/drawGridExample.html">./iteration1/drawGridExample.html</a>
-</p>
-
-<iframe src="iteration1/drawGridExample.html"></iframe>
-</div>
-</div>
-</div>
-</div>
-
-
-<div id="outline-container-org5b34a2b" class="outline-2">
-<h2 id="org5b34a2b"><span class="section-number-2">3.</span> Iteration 2</h2>
-<div class="outline-text-2" id="text-3">
-</div>
-<div id="outline-container-org81e57e9" class="outline-3">
-<h3 id="org81e57e9"><span class="section-number-3">3.1.</span> HTML</h3>
-<div class="outline-text-3" id="text-3-1">
 <div class="org-src-container">
 <pre class="src src-html">&lt;<span style="color: #c678dd;">html</span>&gt;
   &lt;<span style="color: #c678dd;">head</span>&gt;
@@ -569,9 +365,9 @@ Let&rsquo;s see what the grid looks like at <a href="./iteration1/drawGridExampl
 </div>
 </div>
 
-<div id="outline-container-orgbd14d82" class="outline-3">
-<h3 id="orgbd14d82"><span class="section-number-3">3.2.</span> Javascript</h3>
-<div class="outline-text-3" id="text-3-2">
+<div id="outline-container-orge7a1eb8" class="outline-2">
+<h2 id="orge7a1eb8"><span class="section-number-2">3.</span> Javascript</h2>
+<div class="outline-text-2" id="text-3">
 <p>
 You&rsquo;ll see the stylesheet linked in the HTML is called <code>ocr.js</code>. Let&rsquo;s create that.
 </p>
@@ -586,7 +382,7 @@ Javascript treats everything defined outside of a function as being in the globa
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="orgb816c66"><span style="color: #51afef;">let</span> <span style="color: #dcaeea;">ocrDemo</span> = (<span style="color: #51afef;">function</span>() {
+<pre class="src src-javascript" id="org2590980"><span style="color: #51afef;">let</span> <span style="color: #dcaeea;">ocrDemo</span> = (<span style="color: #51afef;">function</span>() {
     &lt;&lt;javascript constants&gt;&gt;
     &lt;&lt;drawGrid&gt;&gt;
     &lt;&lt;fillSquare&gt;&gt;
@@ -607,17 +403,17 @@ Javascript treats everything defined outside of a function as being in the globa
 </div>
 </div>
 
-<div id="outline-container-org9c793e7" class="outline-4">
-<h4 id="org9c793e7"><span class="section-number-4">3.2.1.</span> Drawing the grid on canvas</h4>
-<div class="outline-text-4" id="text-3-2-1">
+<div id="outline-container-orgccfc3f9" class="outline-3">
+<h3 id="orgccfc3f9"><span class="section-number-3">3.1.</span> Drawing the grid on canvas</h3>
+<div class="outline-text-3" id="text-3-1">
 <p>
 Let&rsquo;s define some constants for coloring the canvas.
 </p>
 
 <div class="org-src-container">
 <pre class="src src-javascript"><span style="color: #51afef;">const</span> <span style="color: #dcaeea;">GRID_STROKE_COLOR</span> = <span style="color: #98be65;">"blue"</span>;
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">BACKGROUND_COLOR</span> = <span style="color: #98be65;">"white"</span>;
-<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">STROKE_COLOR</span> = <span style="color: #98be65;">"black"</span>;
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">BACKGROUND_COLOR</span> = <span style="color: #98be65;">"black"</span>;
+<span style="color: #51afef;">const</span> <span style="color: #dcaeea;">STROKE_COLOR</span> = <span style="color: #98be65;">"white"</span>;
 <span style="color: #51afef;">const</span> <span style="color: #dcaeea;">PIXEL_WIDTH</span> = <span style="color: #da8548; font-weight: bold;">8</span>;
 <span style="color: #51afef;">const</span> <span style="color: #dcaeea;">GRID_WIDTH</span> = <span style="color: #da8548; font-weight: bold;">28</span>;
 <span style="color: #51afef;">const</span> <span style="color: #dcaeea;">CANVAS_WIDTH</span> = PIXEL_WIDTH * GRID_WIDTH;
@@ -631,13 +427,13 @@ Any time we draw a fresh grid, we&rsquo;ll want to fill the entire canvas with t
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="org81c94f2"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">drawGrid</span>(<span style="color: #dcaeea;">ctx</span>) {
+<pre class="src src-javascript" id="org80884ee"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">drawGrid</span>(<span style="color: #dcaeea;">ctx</span>) {
     ctx.fillStyle = BACKGROUND_COLOR;
     ctx.fillRect(<span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #da8548; font-weight: bold;">0</span>, CANVAS_WIDTH, CANVAS_WIDTH);
     ctx.strokeStyle = GRID_STROKE_COLOR;
     <span style="color: #51afef;">for</span> (
-        <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">x</span> = <span style="color: #da8548; font-weight: bold;">0</span>, <span style="color: #dcaeea;">y</span> = <span style="color: #da8548; font-weight: bold;">0</span>;
-        x &lt;= CANVAS_WIDTH;
+        <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">x</span> = PIXEL_WIDTH, <span style="color: #dcaeea;">y</span> = PIXEL_WIDTH;
+        x &lt; CANVAS_WIDTH;
         x += PIXEL_WIDTH, y += PIXEL_WIDTH
     ) {
         ctx.beginPath();
@@ -652,7 +448,7 @@ Any time we draw a fresh grid, we&rsquo;ll want to fill the entire canvas with t
 </div>
 
 <div class="org-src-container">
-<pre class="src src-html" id="org27840bd">&lt;<span style="color: #c678dd;">html</span>&gt;
+<pre class="src src-html" id="orgfde6447">&lt;<span style="color: #c678dd;">html</span>&gt;
   &lt;<span style="color: #c678dd;">body</span>&gt;
     &lt;<span style="color: #c678dd;">canvas</span> <span style="color: #dcaeea;">id</span>=<span style="color: #98be65;">"canvas"</span> <span style="color: #dcaeea;">width</span>=<span style="color: #98be65;">"200"</span> <span style="color: #dcaeea;">height</span>=<span style="color: #98be65;">"200"</span>&gt;&lt;/<span style="color: #c678dd;">canvas</span>&gt;
     &lt;<span style="color: #c678dd;">script</span>&gt;
@@ -675,9 +471,9 @@ Let&rsquo;s see what the grid looks like at <a href="./drawGridExample.html">./d
 </div>
 </div>
 
-<div id="outline-container-org48b9927" class="outline-4">
-<h4 id="org48b9927"><span class="section-number-4">3.2.2.</span> Drawing on the grid</h4>
-<div class="outline-text-4" id="text-3-2-2">
+<div id="outline-container-org2aa16ff" class="outline-3">
+<h3 id="org2aa16ff"><span class="section-number-3">3.2.</span> Drawing on the grid</h3>
+<div class="outline-text-3" id="text-3-2">
 <p>
 Let&rsquo;s write a function that will take a mouse event and a canvas element and will fill a square of the grid.
 </p>
@@ -695,7 +491,7 @@ If the left edge of the canvas is <code>100</code> pixels to the right of the le
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="org36d59f4"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">fillSquare</span>(<span style="color: #dcaeea;">mouseEvent</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvasElement</span>) {
+<pre class="src src-javascript" id="org71affad"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">fillSquare</span>(<span style="color: #dcaeea;">mouseEvent</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvasElement</span>) {
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">boundingRect</span> = canvasElement.getBoundingClientRect();
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">x</span> = mouseEvent.clientX - boundingRect.x;
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">y</span> = mouseEvent.clientY - boundingRect.y;
@@ -715,7 +511,7 @@ If the left edge of the canvas is <code>100</code> pixels to the right of the le
 </div>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="org4b73c15"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">onMouseDown</span>(<span style="color: #dcaeea;">event</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvas</span>) {
+<pre class="src src-javascript" id="org0df1c54"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">onMouseDown</span>(<span style="color: #dcaeea;">event</span>, <span style="color: #dcaeea;">context</span>, <span style="color: #dcaeea;">canvas</span>) {
     canvas.isDrawing = <span style="color: #a9a1e1;">true</span>;
     fillSquare(event, context, canvas);
 }
@@ -779,7 +575,7 @@ If there is no ink coloring the pixel, then the value will be <code>0</code>.
 So, if our zero looks like this:
 </p>
 
-<pre class="example" id="org1be58b7">
+<pre class="example" id="org71b2bab">
 111
 101
 111
@@ -789,7 +585,7 @@ So, if our zero looks like this:
 Then the list representing the first row will be:
 </p>
 
-<pre class="example" id="orge31a782">
+<pre class="example" id="org41a5086">
 [1, 1, 1]
 </pre>
 
@@ -797,7 +593,7 @@ Then the list representing the first row will be:
 And the list representing the second row will be:
 </p>
 
-<pre class="example" id="org51e94fc">
+<pre class="example" id="orgd627923">
 [1, 0, 1]
 </pre>
 
@@ -805,7 +601,7 @@ And the list representing the second row will be:
 And we can combine each of the three rows into an list of lists:
 </p>
 
-<pre class="example" id="orgeab9b8e">
+<pre class="example" id="org87b6e2b">
 [[1, 1, 1],
  [1, 0, 1],
  [1, 1, 1]]
@@ -831,7 +627,7 @@ Along with coloring the square in the grid, we also want to store the informatio
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="org23fbe40"><span style="color: #51afef;">let</span> <span style="color: #dcaeea;">pixelIndex</span> = yPixel * GRID_WIDTH + xPixel;
+<pre class="src src-javascript" id="orgfaeabdc"><span style="color: #51afef;">let</span> <span style="color: #dcaeea;">pixelIndex</span> = yPixel * GRID_WIDTH + xPixel;
 pixelData[pixelIndex] = <span style="color: #da8548; font-weight: bold;">1</span>;
 </pre>
 </div>
@@ -841,7 +637,7 @@ Now we have everything we need to complete our <code>onLoadFunction</code>. In i
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="orgbee3e8b"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">onLoadFunction</span>() {
+<pre class="src src-javascript" id="org3cea29a"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">onLoadFunction</span>() {
     resetCanvas();
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">canvasEl</span> = document.getElementById(<span style="color: #98be65;">"canvas"</span>);
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">context</span> = canvasEl.getContext(<span style="color: #98be65;">"2d"</span>);
@@ -857,7 +653,7 @@ For the functionality of clearing the canvas to reset our drawing, we&rsquo;ll s
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="orgb895f13"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">resetCanvas</span>() {
+<pre class="src src-javascript" id="org62e1d17"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">resetCanvas</span>() {
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">canvasEl</span> = document.getElementById(<span style="color: #98be65;">"canvas"</span>);
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">context</span> = canvasEl.getContext(<span style="color: #98be65;">"2d"</span>);
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">gridSize</span> = Math.pow((CANVAS_WIDTH / PIXEL_WIDTH), <span style="color: #da8548; font-weight: bold;">2</span>);
@@ -871,18 +667,18 @@ For the functionality of clearing the canvas to reset our drawing, we&rsquo;ll s
 </div>
 </div>
 
-<div id="outline-container-org87d8374" class="outline-4">
-<h4 id="org87d8374"><span class="section-number-4">3.2.3.</span> Sending data to the server</h4>
-<div class="outline-text-4" id="text-3-2-3">
+<div id="outline-container-orgef4e025" class="outline-3">
+<h3 id="orgef4e025"><span class="section-number-3">3.3.</span> Sending data to the server</h3>
+<div class="outline-text-3" id="text-3-3">
 <div class="org-src-container">
-<pre class="src src-javascript" id="org28d43ee">&lt;&lt;sendData&gt;&gt;
+<pre class="src src-javascript" id="org651784c">&lt;&lt;sendData&gt;&gt;
 &lt;&lt;train&gt;&gt;
 &lt;&lt;predict&gt;&gt;
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="org0f045ac"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">sendData</span>(<span style="color: #dcaeea;">path</span>, <span style="color: #dcaeea;">json</span>) {
+<pre class="src src-javascript" id="org2904e48"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">sendData</span>(<span style="color: #dcaeea;">path</span>, <span style="color: #dcaeea;">json</span>) {
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">xhr</span> = <span style="color: #51afef;">new</span> <span style="color: #ECBE7B;">XMLHttpRequest</span>();
     xhr.open(<span style="color: #98be65;">"POST"</span>, <span style="color: #98be65;">`http://${HOST}:${PORT}/${path}`</span>);
     xhr.onload = <span style="color: #51afef;">function</span>() {
@@ -907,7 +703,7 @@ For the functionality of clearing the canvas to reset our drawing, we&rsquo;ll s
 </div>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="orgeb86ea2"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">train</span>() {
+<pre class="src src-javascript" id="org3981e61"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">train</span>() {
     <span style="color: #51afef;">let</span> <span style="color: #dcaeea;">digitValue</span> = document.getElementById(<span style="color: #98be65;">"digit"</span>).value;
     <span style="color: #51afef;">if</span> (!digitValue.match(<span style="color: #98be65;">/^\d/</span>)) {
         alert(<span style="color: #98be65;">"Please type and draw a digit in order to train the network."</span>);
@@ -923,7 +719,7 @@ For the functionality of clearing the canvas to reset our drawing, we&rsquo;ll s
 </div>
 
 <div class="org-src-container">
-<pre class="src src-javascript" id="orgb2010ba"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">predict</span>() {
+<pre class="src src-javascript" id="org03fe819"><span style="color: #51afef;">function</span> <span style="color: #c678dd;">predict</span>() {
     <span style="color: #51afef;">if</span> (pixelData.indexOf(<span style="color: #da8548; font-weight: bold;">1</span>) &lt; <span style="color: #da8548; font-weight: bold;">0</span>) {
         alert(<span style="color: #98be65;">"Please draw a digit in order to use prediction."</span>);
     } <span style="color: #51afef;">else</span> {
@@ -938,10 +734,9 @@ For the functionality of clearing the canvas to reset our drawing, we&rsquo;ll s
 </div>
 </div>
 </div>
-</div>
 
-<div id="outline-container-org4cd700f" class="outline-2">
-<h2 id="org4cd700f"><span class="section-number-2">4.</span> Python Server</h2>
+<div id="outline-container-org7bb7933" class="outline-2">
+<h2 id="org7bb7933"><span class="section-number-2">4.</span> Python Server</h2>
 <div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #51afef;">import</span> http.server
@@ -1011,12 +806,12 @@ For the functionality of clearing the canvas to reset our drawing, we&rsquo;ll s
 </div>
 </div>
 
-<div id="outline-container-orgc04032d" class="outline-2">
-<h2 id="orgc04032d"><span class="section-number-2">5.</span> Neural Network</h2>
+<div id="outline-container-orgaa6d335" class="outline-2">
+<h2 id="orgaa6d335"><span class="section-number-2">5.</span> Neural Network</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-orgf911428" class="outline-3">
-<h3 id="orgf911428"><span class="section-number-3">5.1.</span> Requirements</h3>
+<div id="outline-container-orgcf5204a" class="outline-3">
+<h3 id="orgcf5204a"><span class="section-number-3">5.1.</span> Requirements</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 Matplotlib and Numpy are two external requirements we&rsquo;ll need.
@@ -1030,30 +825,30 @@ numpy
 </div>
 </div>
 
-<div id="outline-container-orgab266f2" class="outline-3">
-<h3 id="orgab266f2"><span class="section-number-3">5.2.</span> What is an Artificial Neural Network?</h3>
+<div id="outline-container-orga7df0ae" class="outline-3">
+<h3 id="orga7df0ae"><span class="section-number-3">5.2.</span> What is an Artificial Neural Network?</h3>
 <div class="outline-text-3" id="text-5-2">
 </div>
-<div id="outline-container-org59c7e26" class="outline-4">
-<h4 id="org59c7e26"><span class="section-number-4">5.2.1.</span> The &ldquo;Model&rdquo; <b>is</b> the weights&#x2026;</h4>
+<div id="outline-container-orga5862d0" class="outline-4">
+<h4 id="orga5862d0"><span class="section-number-4">5.2.1.</span> The &ldquo;Model&rdquo; <b>is</b> the weights&#x2026;</h4>
 </div>
 </div>
 
-<div id="outline-container-orgb6808d7" class="outline-3">
-<h3 id="orgb6808d7"><span class="section-number-3">5.3.</span> Implementing a single Perceptron</h3>
+<div id="outline-container-orgbd78351" class="outline-3">
+<h3 id="orgbd78351"><span class="section-number-3">5.3.</span> Implementing a single Perceptron</h3>
 </div>
 
-<div id="outline-container-orga0f4001" class="outline-3">
-<h3 id="orga0f4001"><span class="section-number-3">5.4.</span> How to tell if data is linealy seperable?</h3>
+<div id="outline-container-org42d6f0b" class="outline-3">
+<h3 id="org42d6f0b"><span class="section-number-3">5.4.</span> How to tell if data is linealy seperable?</h3>
 <div class="outline-text-3" id="text-5-4">
 </div>
-<div id="outline-container-orga821fe5" class="outline-4">
-<h4 id="orga821fe5"><span class="section-number-4">5.4.1.</span> XOR example</h4>
+<div id="outline-container-orgee4e0f9" class="outline-4">
+<h4 id="orgee4e0f9"><span class="section-number-4">5.4.1.</span> XOR example</h4>
 </div>
 </div>
 
-<div id="outline-container-org5f0b7fb" class="outline-3">
-<h3 id="org5f0b7fb"><span class="section-number-3">5.5.</span> Backpropagation</h3>
+<div id="outline-container-org28d451e" class="outline-3">
+<h3 id="org28d451e"><span class="section-number-3">5.5.</span> Backpropagation</h3>
 <div class="outline-text-3" id="text-5-5">
 <p>
 I want this code to be perfectly repeatable. But since we&rsquo;ll be initializing some random numbers, you&rsquo;re results might vary if you try to run this code. Therefore, let&rsquo;s give Numpy a specific seed for its random number generation so that we all get the same &ldquo;random&rdquo; numbers.
@@ -1273,8 +1068,8 @@ We are closer to our ideal hardcoded weights. Let&rsquo;s train it again.
 </div>
 </div>
 
-<div id="outline-container-org898ae04" class="outline-4">
-<h4 id="org898ae04"><span class="section-number-4">5.5.1.</span> Imports</h4>
+<div id="outline-container-orgf72ee04" class="outline-4">
+<h4 id="orgf72ee04"><span class="section-number-4">5.5.1.</span> Imports</h4>
 <div class="outline-text-4" id="text-5-5-1">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #51afef;">import</span> numpy <span style="color: #51afef;">as</span> np
@@ -1286,8 +1081,8 @@ We are closer to our ideal hardcoded weights. Let&rsquo;s train it again.
 </div>
 </div>
 
-<div id="outline-container-org1a5859e" class="outline-4">
-<h4 id="org1a5859e"><span class="section-number-4">5.5.2.</span> Helper</h4>
+<div id="outline-container-org072a6b9" class="outline-4">
+<h4 id="org072a6b9"><span class="section-number-4">5.5.2.</span> Helper</h4>
 <div class="outline-text-4" id="text-5-5-2">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #51afef;">def</span> <span style="color: #c678dd;">flatten</span>(l):
@@ -1304,8 +1099,8 @@ We are closer to our ideal hardcoded weights. Let&rsquo;s train it again.
 </div>
 </div>
 
-<div id="outline-container-orgdbba085" class="outline-3">
-<h3 id="orgdbba085"><span class="section-number-3">5.6.</span> MNIST OCR Neural Network</h3>
+<div id="outline-container-orgbb947a1" class="outline-3">
+<h3 id="orgbb947a1"><span class="section-number-3">5.6.</span> MNIST OCR Neural Network</h3>
 <div class="outline-text-3" id="text-5-6">
 <p>
 <code>np.random.rand</code> creates a matrix of random values between [0, 1). The arguments passed are the sizes of each dimension. <code>np.random.rand(2, 3)</code> will create a 2x3 matrix of random values.
@@ -1320,7 +1115,7 @@ So <code>x</code> in the generator below will be a numpy array that looks like <
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org2ee63b7"><span style="color: #51afef;">def</span> <span style="color: #c678dd;">_initialize_random_weights</span>(<span style="color: #51afef;">self</span>, size_in, size_out):
+<pre class="src src-python" id="org7c3565e"><span style="color: #51afef;">def</span> <span style="color: #c678dd;">_initialize_random_weights</span>(<span style="color: #51afef;">self</span>, size_in, size_out):
 <span style="background-color: #282c34;"> </span>   <span style="color: #83898d;">"""</span>
 <span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   Creates a matrix with `size_out` rows and `size_in` columns.</span>
 <span style="color: #83898d; background-color: #282c34;"> </span><span style="color: #83898d;">   Values will be randomized between -0.06 and 0.06.</span>
@@ -1528,7 +1323,7 @@ So <code>x</code> in the generator below will be a numpy array that looks like <
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Eric Ihli</p>
-<p class="date">Created: 2021-08-24 Tue 15:31</p>
+<p class="date">Created: 2021-09-25 Sat 10:17</p>
 </div>
 </body>
 </html>
